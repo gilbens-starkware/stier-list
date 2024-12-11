@@ -25,6 +25,7 @@ struct TierListMeta {
     name: ShortString,
     creation_time: Time,
     owner: ContractAddress,
+    image_id: felt252,
 }
 
 /// Represents an element in a tier list.
@@ -37,7 +38,7 @@ struct TierListElement {
 #[starknet::interface]
 trait ITierListMaker<T> {
     fn add_tier_list(
-        ref self: T, name: ShortString, initial_elements: Span<TierListElement>,
+        ref self: T, name: ShortString, initial_elements: Span<TierListElement>, image_id: felt252
     ) -> u64;
     fn get_tier_list_meta(self: @T, id: u64) -> TierListMeta;
     fn get_tier_list_elements(self: @T, id: u64) -> Span<TierListElement>;
@@ -85,14 +86,18 @@ mod tier_list_maker {
     #[abi(embed_v0)]
     impl TierListMakerImpl of super::ITierListMaker<ContractState> {
         fn add_tier_list(
-            ref self: ContractState, name: ShortString, initial_elements: Span<TierListElement>,
+            ref self: ContractState,
+            name: ShortString,
+            initial_elements: Span<TierListElement>,
+            image_id: felt252,
         ) -> u64 {
             let tier_list_id = self.tier_list_order.len();
             let tier_list_meta = TierListMeta {
                 id: tier_list_id,
                 name,
                 creation_time: TimeTrait::now(),
-                owner: starknet::get_caller_address()
+                owner: starknet::get_caller_address(),
+                image_id,
             };
             self.tier_list_order.append().write(tier_list_id);
             let tier_list_ptr = self.tier_lists.entry(tier_list_id);

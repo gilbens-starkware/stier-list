@@ -3,62 +3,20 @@ import { Abi } from '@starknet-react/core';
 /// A prefix to be added to the src path of resources (images, etc.) in order to correctly load them.
 /// Production mode is when deploying the app to a server, github pages in our case.
 export const SrcPrefix =
-  import.meta.env.MODE === 'production' ? '/stier-list' : '';
+  import.meta.env.MODE === 'production' ? '/catering-app' : '';
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x01d2e5558888143bdeae7443d9a18c949371efc643f0cad6afc18beb76b80304';
+  '0x0585f41900bc18678506af93776039332af70b1d1ac1ec69fcc5e9acddf8d430';
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x01d2e5558888143bdeae7443d9a18c949371efc643f0cad6afc18beb76b80304
+/// https://sepolia.starkscan.co/contract/0x0585f41900bc18678506af93776039332af70b1d1ac1ec69fcc5e9acddf8d430
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
     "name": "TierListMakerImpl",
     "type": "impl",
     "interface_name": "stier_list::stier_list::ITierListMaker"
-  },
-  {
-    "name": "stier_list::utils::time::Time",
-    "type": "struct",
-    "members": [
-      {
-        "name": "seconds",
-        "type": "core::integer::u64"
-      }
-    ]
-  },
-  {
-    "name": "core::byte_array::ByteArray",
-    "type": "struct",
-    "members": [
-      {
-        "name": "data",
-        "type": "core::array::Array::<core::bytes_31::bytes31>"
-      },
-      {
-        "name": "pending_word",
-        "type": "core::felt252"
-      },
-      {
-        "name": "pending_word_len",
-        "type": "core::integer::u32"
-      }
-    ]
-  },
-  {
-    "name": "stier_list::stier_list::Image",
-    "type": "enum",
-    "variants": [
-      {
-        "name": "Url",
-        "type": "core::byte_array::ByteArray"
-      },
-      {
-        "name": "Hosted",
-        "type": "core::felt252"
-      }
-    ]
   },
   {
     "name": "stier_list::stier_list::TierListElement",
@@ -69,12 +27,8 @@ export const ABI = [
         "type": "core::felt252"
       },
       {
-        "name": "creation_time",
-        "type": "stier_list::utils::time::Time"
-      },
-      {
-        "name": "image",
-        "type": "stier_list::stier_list::Image"
+        "name": "image_id",
+        "type": "core::felt252"
       }
     ]
   },
@@ -85,6 +39,16 @@ export const ABI = [
       {
         "name": "snapshot",
         "type": "@core::array::Array::<stier_list::stier_list::TierListElement>"
+      }
+    ]
+  },
+  {
+    "name": "stier_list::utils::time::Time",
+    "type": "struct",
+    "members": [
+      {
+        "name": "seconds",
+        "type": "core::integer::u64"
       }
     ]
   },
@@ -195,4 +159,4 @@ export const ABI = [
     "type": "event",
     "variants": []
   }
-]
+] as const satisfies Abi;

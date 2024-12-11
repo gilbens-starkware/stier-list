@@ -1,5 +1,5 @@
 [package]
-name = "event_manager"
+name = "stier_list"
 version = "0.1.0"
 edition = "2024_07"
 

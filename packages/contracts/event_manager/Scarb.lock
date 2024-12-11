@@ -2,5 +2,5 @@
 version = 1
 
 [[package]]
-name = "event_manager"
+name = "stier_list"
 version = "0.1.0"

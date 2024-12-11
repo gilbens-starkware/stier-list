@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Header } from './Header/Header';
-import { useAccount, useReadContract } from '@starknet-react/core';
+import { useAccount, useProvider, useReadContract } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Calendar, Cat, Users, Wrench } from 'lucide-react';
 import { AppTabs } from '../types/ui';
@@ -27,18 +27,8 @@ export const StarkitchenApp = () => {
     setSuccessFetchingUserEvents(false);
   };
 
-  const { data: nLists, refetch: _getNLists } = useReadContract({
-    // Read data from the contract
-    functionName: 'get_number_of_tier_lists', // The function name in the contract
-    enabled: true, // Should we fetch the data immediately or later(manually)
-    abi: ABI, // TODO: Replace with your own ABI
-    address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
-    args: [], // The contract method's arguments as an array
-  });
-
-  // TODO(Ohad): mock, remove.
   const sampleItems = [
-    { id: '1', image: '/placeholder.svg?height=64&width=64&text=1' },
+    { id: '1', image: 'http://192.168.13.34:8000/images/1/' },
     { id: '2', image: '/placeholder.svg?height=64&width=64&text=2' },
     { id: '3', image: '/placeholder.svg?height=64&width=64&text=3' },
     { id: '4', image: '/placeholder.svg?height=64&width=64&text=4' },
@@ -62,9 +52,9 @@ export const StarkitchenApp = () => {
               <Calendar className="mr-2 h-4 w-4" />
               TierList
             </TabsTrigger>
-            <TabsTrigger value={AppTabs.TIER_LIST_RANK}>
+            <TabsTrigger value={AppTabs.TIER_LIST_MAKER}>
               <Cat />
-              Tier List Rank
+              Tier List Maker
             </TabsTrigger>
             <TabsTrigger value={AppTabs.TIER_LIST_CREATE}>
               <Wrench />
@@ -79,9 +69,9 @@ export const StarkitchenApp = () => {
             ) : null}
           </TabsList>
           <TabsContent value={AppTabs.TIER_LIST} className="space-y-12">
-            <TierListTab nLists={nLists} activeTab={activeTab} />
+            <TierListTab activeTab={activeTab} />
           </TabsContent>
-          <TabsContent value={AppTabs.TIER_LIST_RANK} className="space-y-12">
+          <TabsContent value={AppTabs.TIER_LIST_MAKER} className="space-y-12">
             <TierListMaker items={sampleItems} />
           </TabsContent>
           <TabsContent value={AppTabs.TIER_LIST_CREATE} className="space-y-12">

@@ -3,19 +3,19 @@
 import React, { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 
-interface Item {
+export interface TierListItem {
     id: string
     image: string
 }
 
 interface TierListMakerProps {
-    items: Item[]
+    items: TierListItem[]
 }
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
 
 export default function TierListMaker({ items }: TierListMakerProps) {
-    const [tierItems, setTierItems] = useState<{ [key: string]: Item[] }>({
+    const [tierItems, setTierItems] = useState<{ [key: string]: TierListItem[] }>({
         S: [],
         T: [],
         A: [],
@@ -23,10 +23,10 @@ export default function TierListMaker({ items }: TierListMakerProps) {
         K: [],
         unranked: items,
     })
-    const [draggingItem, setDraggingItem] = useState<Item | null>(null)
+    const [draggingItem, setDraggingItem] = useState<TierListItem | null>(null)
     const dragNode = useRef<HTMLDivElement | null>(null)
 
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: Item, tier: string) => {
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, item: TierListItem, tier: string) => {
         setDraggingItem(item)
         dragNode.current = e.target as HTMLDivElement
         e.dataTransfer.effectAllowed = 'move'

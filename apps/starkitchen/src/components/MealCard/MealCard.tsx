@@ -11,7 +11,7 @@ import { Badge } from '../ui/badge';
 import { Meal } from '../../types/meal';
 import { openFullscreenLoader } from '../FullscreenLoaderModal/FullscreenLoaderModal';
 import { shortString } from "starknet";
-import { ABI, CONTRACT_ADDRESS } from '../../utils/consts';
+import { ABI, CONTRACT_ADDRESS, PROVIDER } from '../../utils/consts';
 import { useContract, useSendTransaction } from '@starknet-react/core';
 import { useMemo } from 'react';
 import { TypedContractV2 } from 'starknet';
@@ -39,6 +39,7 @@ export const MealCard = ({
   const { contract } = useContract({
     abi: ABI,
     address: CONTRACT_ADDRESS,
+    provider: PROVIDER
   }) as { contract?: TypedContractV2<typeof ABI> };
 
   const calls = useMemo(() => {
@@ -108,9 +109,9 @@ export const MealCard = ({
           {shortString.decodeShortString(meal.info?.description ?? '') ?? 'Not Set Yet'}
         </p>
         {isWalletConnected &&
-        !isAllowedUser &&
-        isSuccessFetchingUserEvents &&
-        !meal.info.registered ? (
+          !isAllowedUser &&
+          isSuccessFetchingUserEvents &&
+          !meal.info.registered ? (
           <div className="flex items-center mt-2 text-red-500">
             <AlertCircle className="w-4 h-4 mr-2" />
             <span className="text-sm">

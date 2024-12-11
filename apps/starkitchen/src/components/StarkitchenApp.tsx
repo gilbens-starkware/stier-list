@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Header } from './Header/Header';
 import { useAccount, useReadContract } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Calendar, Cat, Users } from 'lucide-react';
+import { Calendar, Cat, Users, Wrench } from 'lucide-react';
 import { AppTabs } from '../types/ui';
 import { useMealData } from '../hooks/useMealData';
 import { ManagementTab } from './ManagementTab/ManagementTab';
 import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
 import { TierListTab } from './TierListTab/TierListTab';
 import TierListMaker from './TierListRank/TIerListRank';
+import { CreateTab } from './CreateTab/CreateTab';
 
 /// A function to create the main StarkitchenApp component.
 export const StarkitchenApp = () => {
@@ -65,6 +66,11 @@ export const StarkitchenApp = () => {
               <Cat />
               Tier List Rank
             </TabsTrigger>
+            <TabsTrigger value={AppTabs.TIER_LIST_CREATE}>
+              <Wrench />
+              Create Tier List
+            </TabsTrigger>
+
             {isAdmin ? (
               <TabsTrigger value={AppTabs.MANAGEMENT}>
                 <Users className="mr-2 h-4 w-4" />
@@ -77,6 +83,9 @@ export const StarkitchenApp = () => {
           </TabsContent>
           <TabsContent value={AppTabs.TIER_LIST_RANK} className="space-y-12">
             <TierListMaker items={sampleItems} />
+          </TabsContent>
+          <TabsContent value={AppTabs.TIER_LIST_CREATE} className="space-y-12">
+            <CreateTab />
           </TabsContent>
           {isAdmin ? (
             <TabsContent value={AppTabs.MANAGEMENT} className="space-y-12">

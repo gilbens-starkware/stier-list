@@ -1,0 +1,1 @@
+export { usePrimaryWalletId } from './usePrimaryWalletId';

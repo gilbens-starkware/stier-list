@@ -1,0 +1,1 @@
+export { FundingWidget } from './FundingWidget';

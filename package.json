@@ -1,0 +1,20 @@
+{
+  "name": "catering-app",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev:starkitchen": "pnpm --filter @catering-app/starkitchen dev",
+    "build:starkitchen": "pnpm --filter @catering-app/starkitchen build",
+    "preview:starkitchen": "pnpm --filter @catering-app/starkitchen preview",
+    "deploy:starkitchen": "pnpm --filter @catering-app/starkitchen run deploy"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "packages/contracts",
+    "packages/starknet-contract-connect",
+    "apps/starkitchen"
+  ]
+}

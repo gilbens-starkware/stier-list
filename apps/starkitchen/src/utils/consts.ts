@@ -8,10 +8,10 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x045b00e185685127b1ab12e37bdf1bfe72b787e40be593ac9e8f821d87042989';
+  '0x07a57d5d7d7d991139dca2f8ab2644a0a4976c66c61b3bae023b62585143e35f';
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x045b00e185685127b1ab12e37bdf1bfe72b787e40be593ac9e8f821d87042989
+/// https://sepolia.starkscan.co/contract/0x07a57d5d7d7d991139dca2f8ab2644a0a4976c66c61b3bae023b62585143e35f
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
@@ -86,6 +86,26 @@ export const ABI = [
       {
         "name": "snapshot",
         "type": "@core::array::Array::<stier_list::stier_list::TierListMeta>"
+      }
+    ]
+  },
+  {
+    "name": "core::array::Span::<core::integer::u64>",
+    "type": "struct",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::integer::u64>"
+      }
+    ]
+  },
+  {
+    "name": "core::array::Span::<core::array::Span::<core::integer::u64>>",
+    "type": "struct",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<core::array::Span::<core::integer::u64>>"
       }
     ]
   },
@@ -167,6 +187,38 @@ export const ABI = [
         "outputs": [
           {
             "type": "core::array::Span::<stier_list::stier_list::TierListMeta>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "vote_to_list",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "list_id",
+            "type": "core::integer::u64"
+          },
+          {
+            "name": "votes",
+            "type": "core::array::Span::<core::integer::u64>"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "name": "get_votes",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "list_id",
+            "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Span::<core::array::Span::<core::integer::u64>>"
           }
         ],
         "state_mutability": "view"

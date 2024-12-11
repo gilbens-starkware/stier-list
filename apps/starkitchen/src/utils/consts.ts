@@ -8,13 +8,17 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
+<<<<<<< Updated upstream
   '0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4';
 export const PROVIDER = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
 });
+=======
+  '0x045b00e185685127b1ab12e37bdf1bfe72b787e40be593ac9e8f821d87042989';
+>>>>>>> Stashed changes
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4
+/// https://sepolia.starkscan.co/contract/0x045b00e185685127b1ab12e37bdf1bfe72b787e40be593ac9e8f821d87042989
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
@@ -75,6 +79,10 @@ export const ABI = [
       {
         "name": "owner",
         "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "image_id",
+        "type": "core::felt252"
       }
     ]
   },
@@ -103,6 +111,10 @@ export const ABI = [
           {
             "name": "initial_elements",
             "type": "core::array::Span::<stier_list::stier_list::TierListElement>"
+          },
+          {
+            "name": "image_id",
+            "type": "core::felt252"
           }
         ],
         "outputs": [

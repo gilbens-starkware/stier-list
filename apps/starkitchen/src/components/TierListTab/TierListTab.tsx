@@ -10,6 +10,7 @@ import { useProvider, useReadContract } from "@starknet-react/core";
 import { shortString } from "starknet";
 import { Button } from "@/components/ui/button";
 import TierListMaker from "../TierListRank/TIerListRank";
+import TierListViewer from "../TierListView/TierListView";
 
 interface TierList {
     id: number;
@@ -40,10 +41,6 @@ const fetchImage = async (url: string): Promise<string> => {
     }
 };
 
-// const [apple_image, setAppleImage] = useState<any>(null)
-// useEffect(() => {
-//     fetchImage('/apple.png').then((image) => setAppleImage(image))
-// }, [])
 const sampleItems = [
     { id: '1', image: 'http://192.168.13.34:8000/images/1/' },
     { id: '2', image: 'http://192.168.13.34:8000/images/2/' },
@@ -54,6 +51,35 @@ const sampleItems = [
     { id: '7', image: 'http://192.168.13.34:8000/images/7/' },
     { id: '8', image: 'http://192.168.13.34:8000/images/8/' },
 ]
+
+const rankData = {
+    S: {
+        1: 3,
+        2: 1,
+        3: 2,
+    },
+    T: {
+        1: 2,
+        4: 3,
+        5: 1,
+    },
+    A: {
+        2: 4,
+        3: 1,
+        6: 2,
+    },
+    R: {
+        4: 2,
+        5: 3,
+        7: 1,
+    },
+    K: {
+        1: 1,
+        6: 2,
+        8: 3,
+    },
+}
+
 
 interface List {
     id: number
@@ -75,22 +101,37 @@ interface ListViewerProps {
 
 export default function ListViewer({ lists, loading, error }: ListViewerProps) {
     const [activeListId, setActiveListId] = useState<number | null>(null)
+    const [viewLists, setViewLists] = useState<boolean>(false)
 
     const handleActivateEvent = (id: number) => {
         console.log(`Activating event with ID: ${id}`)
         setActiveListId(id)
     }
 
+    const handleViewLists = (id: number) => {
+        console.log('Viewing lists')
+        setViewLists(true)
+    }
+
     if (activeListId !== null) {
         return (
-            <div className="min-h-screen w-screen bg-gray-100">
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    <Button onClick={() => setActiveListId(null)} className="mb-4">
-                        Back to Lists
-                    </Button>
-                    <TierListMaker items={sampleItems} />
-                </main>
-            </div>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <Button onClick={() => setActiveListId(null)} className="mb-4">
+                    Back to Lists
+                </Button>
+                <TierListMaker items={sampleItems} />
+            </main>
+        )
+    }
+
+    if (viewLists) {
+        return (
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <Button onClick={() => setViewLists(false)} className="mb-4">
+                    Back to Tier List
+                </Button>
+                <TierListViewer rankData={rankData} images={{}} />
+            </main>
         )
     }
 
@@ -110,7 +151,10 @@ export default function ListViewer({ lists, loading, error }: ListViewerProps) {
                             <p className="text-gray-400">Created At: {list.creation_time?.toString()}</p>
                         </CardContent>
                         <CardContent>
-                            <Button onClick={() => handleActivateEvent(list.id)}>To the list!</Button>
+                            <Button onClick={() => handleActivateEvent(list.id)}>Submit your list!</Button>
+                        </CardContent>
+                        <CardContent>
+                            <Button onClick={() => handleViewLists(list.id)}>view!</Button>
                         </CardContent>
                     </Card>
                 ))}

@@ -52,7 +52,7 @@ export const StarkitchenApp = () => {
               <Calendar className="mr-2 h-4 w-4" />
               TierList
             </TabsTrigger>
-            <TabsTrigger value={AppTabs.TIER_LIST_MAKER}>
+            <TabsTrigger value={AppTabs.TIER_LIST_RANK}>
               <Cat />
               Tier List Maker
             </TabsTrigger>
@@ -71,7 +71,7 @@ export const StarkitchenApp = () => {
           <TabsContent value={AppTabs.TIER_LIST} className="space-y-12">
             <TierListTab activeTab={activeTab} />
           </TabsContent>
-          <TabsContent value={AppTabs.TIER_LIST_MAKER} className="space-y-12">
+          <TabsContent value={AppTabs.TIER_LIST_RANK} className="space-y-12">
             <TierListMaker items={sampleItems} />
           </TabsContent>
           <TabsContent value={AppTabs.TIER_LIST_CREATE} className="space-y-12">

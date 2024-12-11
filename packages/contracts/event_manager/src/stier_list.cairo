@@ -14,6 +14,9 @@ type ShortString = felt252;
 struct TierList {
     meta_data: TierListMeta,
     elements: Vec<TierListElement>,
+    /// A 2D array where the first dimension is the element index and the second dimension is the
+    /// number of times it was ranked in each tier.
+    votes: Vec<Vec<u64>>,
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
@@ -39,6 +42,7 @@ trait ITierListMaker<T> {
     fn get_tier_list_meta(self: @T, id: u64) -> TierListMeta;
     fn get_tier_list_elements(self: @T, id: u64) -> Span<TierListElement>;
     fn get_number_of_tier_lists(self: @T) -> u64;
+    fn get_all_tier_lists(self: @T) -> Span<TierListMeta>;
 }
 
 #[starknet::contract]
@@ -113,6 +117,15 @@ mod tier_list_maker {
         }
         fn get_number_of_tier_lists(self: @ContractState) -> u64 {
             self.tier_list_order.len()
+        }
+        fn get_all_tier_lists(self: @ContractState) -> Span<TierListMeta> {
+            let mut res = array![];
+            let n_tier_lists = self.tier_list_order.len();
+            #[cairofmt::skip]
+            for tier_list_id in 0..n_tier_lists {
+                res.append(self.tier_lists.entry(tier_list_id).meta_data.read());
+            };
+            res.span()
         }
     }
 }

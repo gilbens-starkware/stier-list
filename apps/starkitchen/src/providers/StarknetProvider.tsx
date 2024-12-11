@@ -8,7 +8,11 @@ import {
   braavos,
   useInjectedConnectors,
   voyager,
+  blastProvider,
+  jsonRpcProvider,
 } from '@starknet-react/core';
+import { Chain } from '@starknet-react/chains';
+
 
 export const StarknetProvider = ({
   children,
@@ -20,11 +24,19 @@ export const StarknetProvider = ({
     includeRecommended: 'onlyIfNoConnectors',
     order: 'random',
   });
-
   return (
     <StarknetConfig
       chains={[sepolia]}
-      provider={publicProvider()}
+      provider={jsonRpcProvider({
+        rpc: (chain: Chain) => {
+          if (chain === sepolia) {
+            return {
+              nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+            };
+          }
+          return null;
+        }
+      })}
       connectors={connectors}
       explorer={voyager}
       autoConnect

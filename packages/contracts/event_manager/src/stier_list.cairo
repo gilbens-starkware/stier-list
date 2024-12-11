@@ -44,7 +44,7 @@ trait ITierListMaker<T> {
     fn get_tier_list_meta(self: @T, id: u64) -> TierListMeta;
     fn get_tier_list_elements(self: @T, id: u64) -> Span<TierListElement>;
     fn get_number_of_tier_lists(self: @T) -> u64;
-    fn get_all_tier_lists(self: @T) -> Span<TierListMeta>;
+    fn get_all_tier_lists(self: @T, n_max: usize) -> Span<TierListMeta>;
     fn vote_to_list(ref self: T, list_id: u64, votes: Span<u64>);
     fn get_votes(self: @T, list_id: u64) -> Span<Span<u64>>;
 }
@@ -131,12 +131,15 @@ mod tier_list_maker {
         fn get_number_of_tier_lists(self: @ContractState) -> u64 {
             self.tier_list_order.len()
         }
-        fn get_all_tier_lists(self: @ContractState) -> Span<TierListMeta> {
+        fn get_all_tier_lists(self: @ContractState, n_max: usize) -> Span<TierListMeta> {
             let mut res = array![];
             let n_tier_lists = self.tier_list_order.len();
             #[cairofmt::skip]
             for tier_list_id in 0..n_tier_lists {
                 res.append(self.tier_lists.entry(tier_list_id).meta_data.read());
+                if res.len().into() == n_max {
+                    break;
+                };
             };
             res.span()
         }

@@ -1,20 +1,60 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useProvider, useReadContract } from "@starknet-react/core";
+import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
 
 export interface TierListItem {
-    id: string
-    image: string
+    name: string
+    image_id: string
 }
 
 interface TierListMakerProps {
-    items: TierListItem[]
+    list_id: number
 }
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
 
-export default function TierListMaker({ items }: TierListMakerProps) {
+export default function TierListMaker({ list_id }: TierListMakerProps) {
+    const [items, setItems] = useState<TierListItem[]>([])
+    const [hoveredItem, setHoveredItem] = useState<TierListItem | null>(null)
+    const { data: tierListElements } = useReadContract({
+        functionName: 'get_tier_list_elements',
+        abi: ABI,
+        address: CONTRACT_ADDRESS,
+        args: [Number(list_id)],
+    });
+
+    useEffect(() => {
+        const fetchElements = async () => {
+            console.log('Fetching elements...')
+            try {
+                await tierListElements;
+                console.log('Elements:', tierListElements)
+                const newItems: TierListItem[] = tierListElements?.map((element: any) => ({
+                    name: element.name,
+                    image_id: element.image_id
+                })) ?? [];
+                setItems(newItems)
+            } catch (e) {
+                setError('Failed to fetch lists. Please try again later.')
+                console.error('Fetch error:', e)
+            } finally {
+                setTierItems({
+                    S: [],
+                    T: [],
+                    A: [],
+                    R: [],
+                    K: [],
+                    unranked: items,
+                })
+            }
+        }
+
+        fetchElements()
+    }, [list_id, tierListElements])
+
     const [tierItems, setTierItems] = useState<{ [key: string]: TierListItem[] }>({
         S: [],
         T: [],
@@ -30,7 +70,7 @@ export default function TierListMaker({ items }: TierListMakerProps) {
         setDraggingItem(item)
         dragNode.current = e.target as HTMLDivElement
         e.dataTransfer.effectAllowed = 'move'
-        e.dataTransfer.setData('text/plain', item.id)
+        e.dataTransfer.setData('text/plain', item.name)
         setTimeout(() => {
             if (dragNode.current) dragNode.current.style.opacity = '0.5'
         }, 0)
@@ -55,7 +95,7 @@ export default function TierListMaker({ items }: TierListMakerProps) {
         if (draggingItem) {
             const updatedTierItems = { ...tierItems }
             Object.keys(updatedTierItems).forEach((tier) => {
-                updatedTierItems[tier] = updatedTierItems[tier].filter((item) => item.id !== draggingItem.id)
+                updatedTierItems[tier] = updatedTierItems[tier].filter((item) => item.image_id !== draggingItem.image_id)
             })
             updatedTierItems[targetTier].push(draggingItem)
             setTierItems(updatedTierItems)
@@ -107,14 +147,16 @@ export default function TierListMaker({ items }: TierListMakerProps) {
                     >
                         {tierItems[tier].map((item) => (
                             <div
-                                key={item.id}
+                                key={item.name}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, item, tier)}
                                 onDragEnd={handleDragEnd}
-                                className="w-16 h-16 bg-white rounded shadow cursor-move"
+                                onMouseEnter={() => setHoveredItem(item)}
+                                onMouseLeave={() => setHoveredItem(null)}
+                                className="w-16 h-16 bg-white rounded shadow cursor-move relative"
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`Item ${item.id} in tier ${tier}`}
+                                aria-label={`Item ${item.name} in tier ${tier}`}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                         e.preventDefault()
@@ -122,7 +164,20 @@ export default function TierListMaker({ items }: TierListMakerProps) {
                                     }
                                 }}
                             >
-                                <img src={item.image} alt={`Item ${item.id}`} className="w-full h-full object-cover rounded" />
+                                <img
+                                    src={`http://192.168.13.34:8000/images/${item.image_id}/`}
+                                    alt={`Item ${item.name}`}
+                                    className="w-full h-full object-cover rounded"
+                                />
+                                {hoveredItem === item && (
+                                    <div className="absolute z-10 left-1/2 bottom-full mb-2 transform -translate-x-1/2">
+                                        <img
+                                            src={`http://192.168.13.34:8000/images/${item.image_id}/`}
+                                            alt={`Enlarged ${item.name}`}
+                                            className="max-w-[200px] max-h-[200px] w-auto h-auto object-contain rounded shadow-lg border-2 border-white bg-white"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -133,5 +188,9 @@ export default function TierListMaker({ items }: TierListMakerProps) {
             </Button>
         </div>
     )
+}
+
+function setError(arg0: string) {
+    throw new Error('Function not implemented.');
 }
 

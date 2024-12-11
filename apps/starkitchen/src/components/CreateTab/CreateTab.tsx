@@ -71,7 +71,7 @@ export const CreateTab = ({ }: {
     calls,
   });
 
-  const getTierlistContent = async (blocks: { id: number; itemName: string; imageFile: File | null }[], data: any, tierlist_icon: any) => {
+  const getTierlistContent = async (blocks: { id: number; itemName: string; imageFile: File | null }[], data: any, tierlist_icon: any, has_image_id: boolean) => {
     let content: { name: string; initial_elements: { name: string; image_id: any }[]; image_id: any } = {
       name: tierlist_name,
       initial_elements: [],
@@ -92,7 +92,7 @@ export const CreateTab = ({ }: {
     });
     console.log("Finished getTierlistContent", content);
     console.log(tierlistIconFile, tierlist_icon)
-    if (tierlistIconFile !== null && tierlist_icon !== 0) {
+    if (has_image_id && tierlistIconFile !== null && tierlist_icon !== null) {
       console.log("Found proper ID for tierlist icon", tierlist_icon.uploaded_images[tierlistIconFile.name]);
       content.image_id = tierlist_icon.uploaded_images[tierlistIconFile.name];
     }
@@ -126,13 +126,28 @@ export const CreateTab = ({ }: {
   const saveTierlist = async () => {
 
     console.log(blocks);
-    let data = await sendImagesToServer(blocks.map((block) => block.imageFile).filter((file) => file !== null) as File[]);
-    let tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
+    let item_images_data = null;
+    let has_item_images = false;
+    let item_images_files = blocks.map((block) => block.imageFile).filter((file) => file !== null) as File[];
+    if (item_images_files.length > 0) {
+      has_item_images = true;
+    }
+    if (has_item_images) {
+      item_images_data = await sendImagesToServer(item_images_files);
+    }
+    //item_images_data = await sendImagesToServer(blocks.map((block) => block.imageFile).filter((file) => file !== null) as File[]);
 
-    let icon_data = 0;
+    let has_image_id = false;
     let icon_file_array = [tierlistIconFile].filter((file) => file !== null) as File[];
     if (icon_file_array.length > 0) {
+      has_image_id = true;
+    }
+    let tierlistIconForChain = null;//await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
+
+
+    if (has_image_id) {
       let icon_data = await sendImagesToServer(icon_file_array);
+      tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
       console.log("Icon data", icon_data);
 
     }
@@ -146,8 +161,8 @@ export const CreateTab = ({ }: {
     // }
 
     //let tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
-    console.log(data)
-    await getTierlistContent(blocks, data, tierlistIconForChain);
+    console.log(item_images_data)
+    await getTierlistContent(blocks, item_images_data, tierlistIconForChain, has_image_id);
     console.log("Full content", tierlist_data_for_chain);
     console.log("Icone file", tierlistIconFile);
     // for (file in blocks.map((block) => block.imageFile)) {

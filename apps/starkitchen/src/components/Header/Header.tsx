@@ -10,9 +10,11 @@ import { ConnectWalletButton } from '../ConnectWalletButton/ConnectWalletButton'
 export const Header = ({
   onConnectWallet,
   wallet,
+  nLists,
 }: {
   onConnectWallet: () => void;
   wallet?: UseAccountResult;
+  nLists?: number;
 }) => {
   const [isDisconnectDialogOpen, setIsDisconnectDialogOpen] =
     useState<boolean>(false);
@@ -40,7 +42,10 @@ export const Header = ({
               alt="StarKitchen Logo"
               className="h-12"
             />
-            <h1 className="text-3xl font-bold text-gray-900">StarKitchen</h1>
+            <h1 className="text-3xl font-bold text-gray-900">StierList</h1>
+          </div>
+          <div className="flex items-center space-x-4  mb-4 md:mb-0">
+            <h1 className="text-3xl font-bold text-gray-900">{nLists?.toString()}</h1>
           </div>
           <div className="flex items-center space-x-4">
             {wallet?.isConnected ? (

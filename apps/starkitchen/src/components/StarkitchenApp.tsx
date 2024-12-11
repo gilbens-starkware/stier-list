@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Header } from './Header/Header';
-import { useAccount } from '@starknet-react/core';
+import { useAccount, useReadContract } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Calendar, PieChart, Users } from 'lucide-react';
 import { AppTabs } from '../types/ui';
@@ -8,6 +8,8 @@ import { UpcomingMealsTab } from './UpcomingMealsTab/UpcomingMealsTab';
 import { StatsTab } from './StatsTab/StatsTab';
 import { useMealData } from '../hooks/useMealData';
 import { ManagementTab } from './ManagementTab/ManagementTab';
+import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
+import { TierListTab } from './TierListTab/TierListTab';
 
 /// A function to create the main StarkitchenApp component.
 export const StarkitchenApp = () => {
@@ -33,6 +35,15 @@ export const StarkitchenApp = () => {
     setSuccessFetchingUserEvents(false);
   };
 
+  const { data: nLists, refetch: getNLists } = useReadContract({
+    // Read data from the contract
+    functionName: 'get_number_of_tier_lists', // The function name in the contract
+    enabled: true, // Should we fetch the data immediately or later(manually)
+    abi: ABI, // TODO: Replace with your own ABI
+    address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
+    args: [], // The contract method's arguments as an array
+  });
+
   return (
     <div className="min-h-screen w-screen bg-gray-100">
       <Header wallet={starknetWallet} onConnectWallet={onConnectWallet} />
@@ -43,6 +54,10 @@ export const StarkitchenApp = () => {
           className="space-y-4"
         >
           <TabsList>
+            <TabsTrigger value={AppTabs.TIER_LIST}>
+              <Calendar className="mr-2 h-4 w-4" />
+              TierList
+            </TabsTrigger>
             <TabsTrigger value={AppTabs.MEAL_REGISTRATION}>
               <Calendar className="mr-2 h-4 w-4" />
               Meal Registration
@@ -61,6 +76,9 @@ export const StarkitchenApp = () => {
               </TabsTrigger>
             ) : null}
           </TabsList>
+          <TabsContent value={AppTabs.TIER_LIST} className="space-y-12">
+            <TierListTab nLists={nLists} activeTab={activeTab} />
+          </TabsContent>
           <TabsContent value={AppTabs.MEAL_REGISTRATION} className="space-y-12">
             <UpcomingMealsTab
               updateMeal={updateMeal}

@@ -3,522 +3,196 @@ import { Abi } from '@starknet-react/core';
 /// A prefix to be added to the src path of resources (images, etc.) in order to correctly load them.
 /// Production mode is when deploying the app to a server, github pages in our case.
 export const SrcPrefix =
-  import.meta.env.MODE === 'production' ? '/catering-app' : '';
+  import.meta.env.MODE === 'production' ? '/stier-list' : '';
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x049c75609bb077a9427bc26a9935472ec75e5508ed216ef7f7ad2693397deebc';
+  '0x01d2e5558888143bdeae7443d9a18c949371efc643f0cad6afc18beb76b80304';
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x049c75609bb077a9427bc26a9935472ec75e5508ed216ef7f7ad2693397deebc
+/// https://sepolia.starkscan.co/contract/0x01d2e5558888143bdeae7443d9a18c949371efc643f0cad6afc18beb76b80304
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
-    name: 'RegistrationImpl',
-    type: 'impl',
-    interface_name: 'event_manager::event_manager::IRegistration',
+    "name": "TierListMakerImpl",
+    "type": "impl",
+    "interface_name": "stier_list::stier_list::ITierListMaker"
   },
   {
-    name: 'event_manager::utils::time::Time',
-    type: 'struct',
-    members: [
+    "name": "stier_list::utils::time::Time",
+    "type": "struct",
+    "members": [
       {
-        name: 'seconds',
-        type: 'core::integer::u64',
-      },
-    ],
+        "name": "seconds",
+        "type": "core::integer::u64"
+      }
+    ]
   },
   {
-    name: 'core::bool',
-    type: 'enum',
-    variants: [
+    "name": "core::byte_array::ByteArray",
+    "type": "struct",
+    "members": [
       {
-        name: 'False',
-        type: '()',
+        "name": "data",
+        "type": "core::array::Array::<core::bytes_31::bytes31>"
       },
       {
-        name: 'True',
-        type: '()',
+        "name": "pending_word",
+        "type": "core::felt252"
       },
-    ],
+      {
+        "name": "pending_word_len",
+        "type": "core::integer::u32"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::EventUserInfoInner',
-    type: 'struct',
-    members: [
+    "name": "stier_list::stier_list::Image",
+    "type": "enum",
+    "variants": [
       {
-        name: 'time',
-        type: 'event_manager::utils::time::Time',
+        "name": "Url",
+        "type": "core::byte_array::ByteArray"
       },
       {
-        name: 'registered',
-        type: 'core::bool',
-      },
-      {
-        name: 'canceled',
-        type: 'core::bool',
-      },
-    ],
+        "name": "Hosted",
+        "type": "core::felt252"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::EventUserInfo',
-    type: 'struct',
-    members: [
+    "name": "stier_list::stier_list::TierListElement",
+    "type": "struct",
+    "members": [
       {
-        name: 'id',
-        type: 'core::integer::u32',
+        "name": "name",
+        "type": "core::felt252"
       },
       {
-        name: 'info',
-        type: 'event_manager::event_manager::EventUserInfoInner',
+        "name": "creation_time",
+        "type": "stier_list::utils::time::Time"
       },
-    ],
+      {
+        "name": "image",
+        "type": "stier_list::stier_list::Image"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::UserParticipation',
-    type: 'struct',
-    members: [
+    "name": "core::array::Span::<stier_list::stier_list::TierListElement>",
+    "type": "struct",
+    "members": [
       {
-        name: 'user',
-        type: 'core::starknet::contract_address::ContractAddress',
-      },
-      {
-        name: 'n_participations',
-        type: 'core::integer::u32',
-      },
-    ],
+        "name": "snapshot",
+        "type": "@core::array::Array::<stier_list::stier_list::TierListElement>"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::EventInfoInner',
-    type: 'struct',
-    members: [
+    "name": "stier_list::stier_list::TierListMeta",
+    "type": "struct",
+    "members": [
       {
-        name: 'time',
-        type: 'event_manager::utils::time::Time',
+        "name": "id",
+        "type": "core::integer::u64"
       },
       {
-        name: 'number_of_participants',
-        type: 'core::integer::u32',
+        "name": "name",
+        "type": "core::felt252"
       },
       {
-        name: 'canceled',
-        type: 'core::bool',
+        "name": "creation_time",
+        "type": "stier_list::utils::time::Time"
       },
       {
-        name: 'locked',
-        type: 'core::bool',
-      },
-      {
-        name: 'description',
-        type: 'core::felt252',
-      },
-    ],
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::EventInfo',
-    type: 'struct',
-    members: [
+    "name": "stier_list::stier_list::ITierListMaker",
+    "type": "interface",
+    "items": [
       {
-        name: 'id',
-        type: 'core::integer::u32',
+        "name": "add_tier_list",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "name",
+            "type": "core::felt252"
+          },
+          {
+            "name": "initial_elements",
+            "type": "core::array::Span::<stier_list::stier_list::TierListElement>"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u64"
+          }
+        ],
+        "state_mutability": "external"
       },
       {
-        name: 'info',
-        type: 'event_manager::event_manager::EventInfoInner',
+        "name": "get_tier_list_meta",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "id",
+            "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "stier_list::stier_list::TierListMeta"
+          }
+        ],
+        "state_mutability": "view"
       },
-    ],
+      {
+        "name": "get_tier_list_elements",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "id",
+            "type": "core::integer::u64"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::array::Span::<stier_list::stier_list::TierListElement>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_number_of_tier_lists",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u64"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
   },
   {
-    name: 'core::array::Span::<core::starknet::contract_address::ContractAddress>',
-    type: 'struct',
-    members: [
+    "name": "constructor",
+    "type": "constructor",
+    "inputs": [
       {
-        name: 'snapshot',
-        type: '@core::array::Array::<core::starknet::contract_address::ContractAddress>',
-      },
-    ],
+        "name": "admin",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
   },
   {
-    name: 'event_manager::event_manager::IRegistration',
-    type: 'interface',
-    items: [
-      {
-        name: 'get_user_events_by_time',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-          {
-            name: 'start',
-            type: 'event_manager::utils::time::Time',
-          },
-          {
-            name: 'end',
-            type: 'event_manager::utils::time::Time',
-          },
-        ],
-        outputs: [
-          {
-            type: 'core::array::Array::<event_manager::event_manager::EventUserInfo>',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'n_events',
-        type: 'function',
-        inputs: [],
-        outputs: [
-          {
-            type: 'core::integer::u32',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'get_participation_report_by_time',
-        type: 'function',
-        inputs: [
-          {
-            name: 'start',
-            type: 'event_manager::utils::time::Time',
-          },
-          {
-            name: 'end',
-            type: 'event_manager::utils::time::Time',
-          },
-        ],
-        outputs: [
-          {
-            type: 'core::array::Array::<event_manager::event_manager::UserParticipation>',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'event_info',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-        ],
-        outputs: [
-          {
-            type: 'event_manager::event_manager::EventInfoInner',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'get_events_infos_by_time',
-        type: 'function',
-        inputs: [
-          {
-            name: 'start',
-            type: 'event_manager::utils::time::Time',
-          },
-          {
-            name: 'end',
-            type: 'event_manager::utils::time::Time',
-          },
-        ],
-        outputs: [
-          {
-            type: 'core::array::Array::<event_manager::event_manager::EventInfo>',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'register',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'unregister',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'add_event',
-        type: 'function',
-        inputs: [
-          {
-            name: 'time',
-            type: 'core::felt252',
-          },
-          {
-            name: 'description',
-            type: 'core::felt252',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'modify_event_time',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-          {
-            name: 'time',
-            type: 'core::felt252',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'lock_event',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'unlock_event',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'set_event_canceled',
-        type: 'function',
-        inputs: [
-          {
-            name: 'event_id',
-            type: 'core::integer::u32',
-          },
-          {
-            name: 'canceled',
-            type: 'core::bool',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'add_allowed_user',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'remove_allowed_user',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'add_allowed_users',
-        type: 'function',
-        inputs: [
-          {
-            name: 'users',
-            type: 'core::array::Span::<core::starknet::contract_address::ContractAddress>',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-      {
-        name: 'is_allowed_user',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-        ],
-        outputs: [
-          {
-            type: 'core::bool',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'is_admin',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-        ],
-        outputs: [
-          {
-            type: 'core::bool',
-          },
-        ],
-        state_mutability: 'view',
-      },
-      {
-        name: 'add_admin',
-        type: 'function',
-        inputs: [
-          {
-            name: 'user',
-            type: 'core::starknet::contract_address::ContractAddress',
-          },
-        ],
-        outputs: [],
-        state_mutability: 'external',
-      },
-    ],
-  },
-  {
-    name: 'constructor',
-    type: 'constructor',
-    inputs: [
-      {
-        name: 'admin',
-        type: 'core::starknet::contract_address::ContractAddress',
-      },
-    ],
-  },
-  {
-    kind: 'struct',
-    name: 'event_manager::event_manager::registration::UserRegistration',
-    type: 'event',
-    members: [
-      {
-        kind: 'key',
-        name: 'user',
-        type: 'core::starknet::contract_address::ContractAddress',
-      },
-      {
-        kind: 'key',
-        name: 'event_id',
-        type: 'core::integer::u32',
-      },
-      {
-        kind: 'data',
-        name: 'status',
-        type: 'core::bool',
-      },
-    ],
-  },
-  {
-    kind: 'struct',
-    name: 'event_manager::event_manager::registration::EventChanged',
-    type: 'event',
-    members: [
-      {
-        kind: 'data',
-        name: 'event_id',
-        type: 'core::integer::u32',
-      },
-      {
-        kind: 'data',
-        name: 'time',
-        type: 'event_manager::utils::time::Time',
-      },
-    ],
-  },
-  {
-    kind: 'struct',
-    name: 'event_manager::event_manager::registration::EventCancellation',
-    type: 'event',
-    members: [
-      {
-        kind: 'data',
-        name: 'event_id',
-        type: 'core::integer::u32',
-      },
-      {
-        kind: 'data',
-        name: 'canceled',
-        type: 'core::bool',
-      },
-    ],
-  },
-  {
-    kind: 'struct',
-    name: 'event_manager::event_manager::registration::UserAllowed',
-    type: 'event',
-    members: [
-      {
-        kind: 'data',
-        name: 'user',
-        type: 'core::starknet::contract_address::ContractAddress',
-      },
-      {
-        kind: 'data',
-        name: 'allowed',
-        type: 'core::bool',
-      },
-    ],
-  },
-  {
-    kind: 'enum',
-    name: 'event_manager::event_manager::registration::Event',
-    type: 'event',
-    variants: [
-      {
-        kind: 'nested',
-        name: 'UserRegistration',
-        type: 'event_manager::event_manager::registration::UserRegistration',
-      },
-      {
-        kind: 'nested',
-        name: 'EventChanged',
-        type: 'event_manager::event_manager::registration::EventChanged',
-      },
-      {
-        kind: 'nested',
-        name: 'EventCancellation',
-        type: 'event_manager::event_manager::registration::EventCancellation',
-      },
-      {
-        kind: 'nested',
-        name: 'UserAllowed',
-        type: 'event_manager::event_manager::registration::UserAllowed',
-      },
-    ],
-  },
-] as const satisfies Abi;
+    "kind": "enum",
+    "name": "stier_list::stier_list::tier_list_maker::Event",
+    "type": "event",
+    "variants": []
+  }
+]

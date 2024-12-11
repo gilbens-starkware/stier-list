@@ -1,4 +1,5 @@
 import { Abi } from '@starknet-react/core';
+import { RpcProvider } from 'starknet';
 
 /// A prefix to be added to the src path of resources (images, etc.) in order to correctly load them.
 /// Production mode is when deploying the app to a server, github pages in our case.
@@ -8,6 +9,9 @@ export const SrcPrefix =
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
   '0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4';
+export const PROVIDER = new RpcProvider({
+  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+});
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
 /// https://sepolia.starkscan.co/contract/0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4

@@ -5,27 +5,131 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { ABI, CONTRACT_ADDRESS } from "@/utils/consts";
-import { useEffect, useState } from "react";
-import { useReadContract } from "@starknet-react/core";
-import { get } from "http";
-import { Button } from "../ui/button";
+import { act, useEffect, useState } from "react";
+import { useProvider, useReadContract } from "@starknet-react/core";
 import { shortString } from "starknet";
+import { Button } from "@/components/ui/button";
+import TierListMaker from "../TierListRank/TIerListRank";
 
 interface TierList {
     id: number;
     name: string;
+    creation_time: any;
 }
 
-export function TierListTab({ nLists, activeTab }: { nLists?: number, activeTab?: string }) {
-    const [count, setCount] = useState(nLists || 0)
+const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
+
+const fetchImage = async (url: string): Promise<string> => {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    } catch (error) {
+        console.error('Failed to fetch image:', error);
+        throw error;
+    }
+};
+
+// const [apple_image, setAppleImage] = useState<any>(null)
+// useEffect(() => {
+//     fetchImage('/apple.png').then((image) => setAppleImage(image))
+// }, [])
+const sampleItems = [
+    { id: '1', image: 'http://192.168.13.34:8000/images/1/' },
+    { id: '2', image: 'http://192.168.13.34:8000/images/2/' },
+    { id: '3', image: 'http://192.168.13.34:8000/images/3/' },
+    { id: '4', image: 'http://192.168.13.34:8000/images/4/' },
+    { id: '5', image: 'http://192.168.13.34:8000/images/5/' },
+    { id: '6', image: 'http://192.168.13.34:8000/images/6/' },
+    { id: '7', image: 'http://192.168.13.34:8000/images/7/' },
+    { id: '8', image: 'http://192.168.13.34:8000/images/8/' },
+]
+
+interface List {
+    id: number
+    name: string
+    creation_time?: string
+}
+
+interface Item {
+    id: string
+    image: string
+}
+
+
+interface ListViewerProps {
+    lists: List[]
+    loading: boolean
+    error: string | null
+}
+
+export default function ListViewer({ lists, loading, error }: ListViewerProps) {
+    const [activeListId, setActiveListId] = useState<number | null>(null)
+
+    const handleActivateEvent = (id: number) => {
+        console.log(`Activating event with ID: ${id}`)
+        setActiveListId(id)
+    }
+
+    if (activeListId !== null) {
+        return (
+            <div className="min-h-screen w-screen bg-gray-100">
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <Button onClick={() => setActiveListId(null)} className="mb-4">
+                        Back to Lists
+                    </Button>
+                    <TierListMaker items={sampleItems} />
+                </main>
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-8">
+            {error && <p className="text-red-500">{error}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {lists.map((list) => (
+                    <Card key={list.id} className="bg-gray-800 border-gray-700">
+                        <CardHeader>
+                            <CardTitle className="text-gray-100">{shortString.decodeShortString(list.name)}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-400">ID: {list.id?.toString()}</p>
+                        </CardContent>
+                        <CardContent>
+                            <p className="text-gray-400">Created At: {list.creation_time?.toString()}</p>
+                        </CardContent>
+                        <CardContent>
+                            <Button onClick={() => handleActivateEvent(list.id)}>To the list!</Button>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+            {loading && <p className="text-center">Loading lists...</p>}
+        </div>
+    )
+}
+
+export function TierListTab({ activeTab }: { activeTab: string }) {
+    // const [count, setCount] = useState(nLists || 0)
     const [lists, setLists] = useState<TierList[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const { data: tierListMeta, refetch: getTierListMeta } = useReadContract({
+    console.log('rendering TierListTab...');
+    const { data: tierListMeta } = useReadContract({
         // Read data from the contract
         functionName: 'get_all_tier_lists', // The function name in the contract
-        enabled: true, // Should we fetch the data immediately or later(manually)
         abi: ABI, // TODO: Replace with your own ABI
         address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
         args: [], // The contract method's arguments as an array
@@ -34,16 +138,15 @@ export function TierListTab({ nLists, activeTab }: { nLists?: number, activeTab?
     useEffect(() => {
         const fetchLists = async () => {
             console.log('Fetching lists...')
-            console.log('Count:', count)
             setLoading(true)
             setError(null)
             try {
-                await getTierListMeta()
                 console.log('Data:', tierListMeta)
-                const newLists: TierList[] = tierListMeta.map((meta: any) => ({
+                const newLists: TierList[] = tierListMeta?.map((meta: any) => ({
                     id: meta.id,
                     name: meta.name,
-                }))
+                    creation_time: formatDate(new Date(Number(meta.creation_time.seconds))),
+                })) ?? [];
                 setLists(newLists)
             } catch (e) {
                 setError('Failed to fetch lists. Please try again later.')
@@ -54,26 +157,12 @@ export function TierListTab({ nLists, activeTab }: { nLists?: number, activeTab?
         }
 
         fetchLists()
-    }, [count, activeTab])
+    }, [activeTab])
 
     console.log('Lists:', lists)
+
     return (
-        <div className="space-y-8">
-            {error && <p className="text-red-500">{error}</p>}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* <Button onClick={fetchLists}>Fetch Lists</Button> */}
-                {lists.map((list) => (
-                    <Card key={list.id} className="bg-gray-800 border-gray-700">
-                        <CardHeader>
-                            <CardTitle className="text-gray-100">{shortString.decodeShortString(list.name)}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-gray-400">ID: {list.id?.toString()}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-            {loading && <p className="text-center">Loading lists...</p>}
-        </div>
+        <ListViewer lists={lists} loading={loading} error={error} />
     )
+
 }

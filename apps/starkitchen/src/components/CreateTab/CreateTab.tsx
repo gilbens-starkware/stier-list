@@ -13,6 +13,9 @@ import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
 import { useContract, useSendTransaction } from '@starknet-react/core';
 import { RawArgsObject, TypedContractV2 } from 'starknet';
 import { openFullscreenLoader } from '../FullscreenLoaderModal/FullscreenLoaderModal';
+import { tierlistIconFile } from './globals';
+
+import SelectTierlistIcon from './SelectIcon';
 
 const { month: currentMonth, year: currentYear } = getCurrentDate();
 
@@ -27,8 +30,8 @@ export const CreateTab = ({ }: {
 
 
 
-  const [blocks, setBlocks] = useState<{ id: number; itemName: string; imageFile: File | null }[]>([
-    { id: 1, itemName: '', imageFile: null },
+  const [blocks, setBlocks] = useState<{ id: number; itemName: string; imageFile: File | null; imagePreview: string | null }[]>([
+    { id: 1, itemName: '', imageFile: null, imagePreview: null },
   ]);
 
   const [tierlist_data_for_chain, setTierlistDataForChain] = useState<RawArgsObject>({
@@ -67,7 +70,7 @@ export const CreateTab = ({ }: {
     calls,
   });
 
-  const getTierlistContent = async (blocks: { id: number; itemName: string; imageFile: File | null }[], data: any) => {
+  const getTierlistContent = async (blocks: { id: number; itemName: string; imageFile: File | null }[], data: any, tierlist_icon: any) => {
     let content: { name: string; initial_elements: { name: string; image_id: any }[] } = {
       name: tierlist_name,
       initial_elements: [],
@@ -86,6 +89,11 @@ export const CreateTab = ({ }: {
       }
     });
     console.log("Finished getTierlistContent", content);
+    if (tierlist_icon !== null) {
+      console.log("TODO: add tierlist_icon id to content", tierlist_icon);
+    } else {
+      console.log("Tierlist Icon", 0);
+    }
     setTierlistDataForChain(content);
   }
 
@@ -117,9 +125,11 @@ export const CreateTab = ({ }: {
 
     console.log(blocks);
     let data = await sendImagesToServer(blocks.map((block) => block.imageFile).filter((file) => file !== null) as File[]);
+    let tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
     console.log(data)
-    await getTierlistContent(blocks, data);
+    await getTierlistContent(blocks, data, tierlistIconForChain);
     console.log("Full content", tierlist_data_for_chain);
+    console.log("Icone file", tierlistIconFile);
     // for (file in blocks.map((block) => block.imageFile)) {
 
     // }
@@ -156,14 +166,17 @@ export const CreateTab = ({ }: {
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         <Card>
           <CardHeader>
-            <CardTitle>Tierlist</CardTitle>
+            <CardTitle>Tierlist Name and Icon</CardTitle>
           </CardHeader>
           <CardContent>
+
             <Textarea
               className="min-h-[40px]"
               placeholder="Enter tierlist name here"
               onChange={(e) => updatetTierlistName(e.target.value)}
             />
+            <hr className="my-4 border-gray-300" />
+            <SelectTierlistIcon />
             <hr className="my-4 border-gray-300" />
 
             <DynamicBlocks blocks={blocks} setBlocks={setBlocks} />

@@ -7,10 +7,10 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x0585f41900bc18678506af93776039332af70b1d1ac1ec69fcc5e9acddf8d430';
+  '0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4';
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x0585f41900bc18678506af93776039332af70b1d1ac1ec69fcc5e9acddf8d430
+/// https://sepolia.starkscan.co/contract/0x01fbb9ddf8a318ec6101fc9685964baae292c2c6aefe01e7a28b62a446df0fe4
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
@@ -71,6 +71,16 @@ export const ABI = [
       {
         "name": "owner",
         "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "name": "core::array::Span::<stier_list::stier_list::TierListMeta>",
+    "type": "struct",
+    "members": [
+      {
+        "name": "snapshot",
+        "type": "@core::array::Array::<stier_list::stier_list::TierListMeta>"
       }
     ]
   },
@@ -137,6 +147,17 @@ export const ABI = [
         "outputs": [
           {
             "type": "core::integer::u64"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_all_tier_lists",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Span::<stier_list::stier_list::TierListMeta>"
           }
         ],
         "state_mutability": "view"

@@ -8,10 +8,14 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x07a57d5d7d7d991139dca2f8ab2644a0a4976c66c61b3bae023b62585143e35f';
+  '0x071e3e820ad14596aba0aae113e48ec93ce0308aa535549cdb794a96b7db38e1';
+export const PROVIDER = new RpcProvider({
+  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
+});
+
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x07a57d5d7d7d991139dca2f8ab2644a0a4976c66c61b3bae023b62585143e35f
+/// https://sepolia.starkscan.co/contract/0x071e3e820ad14596aba0aae113e48ec93ce0308aa535549cdb794a96b7db38e1
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
@@ -183,7 +187,12 @@ export const ABI = [
       {
         "name": "get_all_tier_lists",
         "type": "function",
-        "inputs": [],
+        "inputs": [
+          {
+            "name": "n_max",
+            "type": "core::integer::u32"
+          }
+        ],
         "outputs": [
           {
             "type": "core::array::Span::<stier_list::stier_list::TierListMeta>"

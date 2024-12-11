@@ -85,6 +85,7 @@ interface List {
     id: number
     name: string
     creation_time?: string
+    image_id: number
 }
 
 interface Item {
@@ -119,7 +120,7 @@ export default function ListViewer({ lists, loading, error }: ListViewerProps) {
                 <Button onClick={() => setActiveListId(null)} className="mb-4">
                     Back to Lists
                 </Button>
-                <TierListMaker items={sampleItems} />
+                <TierListMaker list_id={activeListId} />
             </main>
         )
     }
@@ -179,7 +180,7 @@ export function TierListTab({ activeTab }: { activeTab: string }) {
         functionName: 'get_all_tier_lists', // The function name in the contract
         abi: ABI, // TODO: Replace with your own ABI
         address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
-        args: [], // The contract method's arguments as an array
+        args: [5], // The contract method's arguments as an array
     });
 
     useEffect(() => {
@@ -188,11 +189,13 @@ export function TierListTab({ activeTab }: { activeTab: string }) {
             setLoading(true)
             setError(null)
             try {
+                await tierListMeta;
                 console.log('Data:', tierListMeta)
                 const newLists: TierList[] = tierListMeta?.map((meta: any) => ({
                     id: meta.id,
                     name: meta.name,
                     creation_time: formatDate(new Date(Number(meta.creation_time.seconds))),
+                    image_id: meta.image_id
                 })) ?? [];
                 setLists(newLists)
             } catch (e) {

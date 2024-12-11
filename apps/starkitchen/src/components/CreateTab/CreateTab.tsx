@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card
 import { Button } from '../ui/button';
 import DynamicBlocks from './AddItem';
 import { Textarea } from '../ui/textarea';
-import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
+import { ABI, CONTRACT_ADDRESS, PROVIDER } from '@/utils/consts';
 import { useContract, useSendTransaction } from '@starknet-react/core';
 import { RawArgsObject, TypedContractV2 } from 'starknet';
 import { openFullscreenLoader } from '../FullscreenLoaderModal/FullscreenLoaderModal';
@@ -54,6 +54,7 @@ export const CreateTab = ({ }: {
   const { contract } = useContract({
     abi: ABI,
     address: CONTRACT_ADDRESS,
+    provider: PROVIDER
   }) as { contract?: TypedContractV2<typeof ABI> };
 
   const calls = useMemo(() => {

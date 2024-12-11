@@ -27,7 +27,8 @@ struct TierListMeta {
     owner: ContractAddress,
     image_id: felt252,
 }
-
+// TODO(Gil): Make variable number of tiers.
+const NUM_TIERS: u64 = 5;
 /// Represents an element in a tier list.
 #[derive(Clone, Drop, starknet::Store, Serde)]
 struct TierListElement {
@@ -44,6 +45,8 @@ trait ITierListMaker<T> {
     fn get_tier_list_elements(self: @T, id: u64) -> Span<TierListElement>;
     fn get_number_of_tier_lists(self: @T) -> u64;
     fn get_all_tier_lists(self: @T) -> Span<TierListMeta>;
+    fn vote_to_list(ref self: T, list_id: u64, votes: Span<u64>);
+    fn get_votes(self: @T, list_id: u64) -> Span<Span<u64>>;
 }
 
 #[starknet::contract]
@@ -104,6 +107,11 @@ mod tier_list_maker {
             tier_list_ptr.meta_data.write(tier_list_meta);
             for element in initial_elements {
                 tier_list_ptr.elements.append().write(element.clone());
+                tier_list_ptr.votes.append();
+                #[cairofmt::skip]
+                for _ in 0..super::NUM_TIERS {
+                    tier_list_ptr.votes.append();
+                };
             };
             tier_list_id
         }
@@ -129,6 +137,39 @@ mod tier_list_maker {
             #[cairofmt::skip]
             for tier_list_id in 0..n_tier_lists {
                 res.append(self.tier_lists.entry(tier_list_id).meta_data.read());
+            };
+            res.span()
+        }
+        fn vote_to_list(ref self: ContractState, list_id: u64, votes: Span<u64>) {
+            let tier_list_ptr = self.tier_lists.entry(list_id);
+            let n_elements = tier_list_ptr.elements.len();
+            assert!(
+                votes.len().into() == n_elements,
+                "Votes length does not match the number of elements"
+            );
+            let mut votes_ptr = tier_list_ptr.votes;
+            #[cairofmt::skip]
+            for i in 0..n_elements {
+                let element_votes_ptr = votes_ptr[i];
+                let voted_tier = votes[i.try_into().unwrap()];
+                let vote_ptr = element_votes_ptr[*voted_tier.into()];
+                vote_ptr.write(vote_ptr.read() + 1);
+            };
+        }
+        fn get_votes(self: @ContractState, list_id: u64) -> Span<Span<u64>> {
+            let tier_list_ptr = self.tier_lists.entry(list_id);
+            let n_elements = tier_list_ptr.elements.len();
+            let mut res = array![];
+            let votes_ptr = tier_list_ptr.votes;
+            #[cairofmt::skip]
+            for i in 0..n_elements {
+                let element_votes_ptr = votes_ptr[i];
+                let mut element_votes = array![];
+                #[cairofmt::skip]
+                for j in 0..super::NUM_TIERS {
+                    element_votes.append(element_votes_ptr[j].read());
+                };
+                res.append(element_votes.span());
             };
             res.span()
         }

@@ -37,6 +37,7 @@ export const CreateTab = ({ }: {
   const [tierlist_data_for_chain, setTierlistDataForChain] = useState<RawArgsObject>({
     name: 'default_tierlist_name',
     initial_elements: [{ name: 'default_item_name', image_id: 'default_image_id' }],
+    image_id: 'default_image_id',
   });
 
   const [tierlist_name, updatetTierlistName] = useState<string>('default_tierlist_name');
@@ -71,9 +72,10 @@ export const CreateTab = ({ }: {
   });
 
   const getTierlistContent = async (blocks: { id: number; itemName: string; imageFile: File | null }[], data: any, tierlist_icon: any) => {
-    let content: { name: string; initial_elements: { name: string; image_id: any }[] } = {
+    let content: { name: string; initial_elements: { name: string; image_id: any }[]; image_id: any } = {
       name: tierlist_name,
       initial_elements: [],
+      image_id: '0',
     };
     blocks.forEach((block) => {
       if (block.imageFile !== null) {
@@ -89,10 +91,10 @@ export const CreateTab = ({ }: {
       }
     });
     console.log("Finished getTierlistContent", content);
-    if (tierlist_icon !== null) {
-      console.log("TODO: add tierlist_icon id to content", tierlist_icon);
-    } else {
-      console.log("Tierlist Icon", 0);
+    console.log(tierlistIconFile, tierlist_icon)
+    if (tierlistIconFile !== null && tierlist_icon !== 0) {
+      console.log("Found proper ID for tierlist icon", tierlist_icon.uploaded_images[tierlistIconFile.name]);
+      content.image_id = tierlist_icon.uploaded_images[tierlistIconFile.name];
     }
     setTierlistDataForChain(content);
   }
@@ -126,6 +128,24 @@ export const CreateTab = ({ }: {
     console.log(blocks);
     let data = await sendImagesToServer(blocks.map((block) => block.imageFile).filter((file) => file !== null) as File[]);
     let tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
+
+    let icon_data = 0;
+    let icon_file_array = [tierlistIconFile].filter((file) => file !== null) as File[];
+    if (icon_file_array.length > 0) {
+      let icon_data = await sendImagesToServer(icon_file_array);
+      console.log("Icon data", icon_data);
+
+    }
+
+
+    // if (tierlistIconFile !== null) {
+    //   console.log("TODO: add tierlist_icon id to content", tierlist_icon.uploaded_images[tierlistIconFile.name]);
+    //   content.image_id = tierlist_icon.uploaded_images[tierlistIconFile.name];
+    // } else {
+    //   content.image_id = 0;
+    // }
+
+    //let tierlistIconForChain = await sendImagesToServer([tierlistIconFile].filter((file) => file !== null) as File[]);
     console.log(data)
     await getTierlistContent(blocks, data, tierlistIconForChain);
     console.log("Full content", tierlist_data_for_chain);

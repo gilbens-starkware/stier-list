@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { Header } from './Header/Header';
 import { useAccount, useReadContract } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Calendar, PieChart, Users } from 'lucide-react';
+import { Calendar, Cat, Users } from 'lucide-react';
 import { AppTabs } from '../types/ui';
-import { UpcomingMealsTab } from './UpcomingMealsTab/UpcomingMealsTab';
-import { StatsTab } from './StatsTab/StatsTab';
 import { useMealData } from '../hooks/useMealData';
 import { ManagementTab } from './ManagementTab/ManagementTab';
 import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
 import { TierListTab } from './TierListTab/TierListTab';
+import TierListMaker from './TierListRank/TIerListRank';
 
 /// A function to create the main StarkitchenApp component.
 export const StarkitchenApp = () => {
@@ -19,15 +18,7 @@ export const StarkitchenApp = () => {
   /// We can also update the activeTab value by calling the setActiveTab function. This will cause the component to re-render.
   const [activeTab, setActiveTab] = useState<string>(AppTabs.MEAL_REGISTRATION);
   const {
-    pastMeals,
-    futureMeals,
-    isAllowedUser,
-    foodieRank,
-    allTimeMealCount,
     isAdmin,
-    loadingAllEvents,
-    isSuccessFetchingUserEvents,
-    updateMeal,
     setSuccessFetchingUserEvents,
   } = useMealData();
 
@@ -35,7 +26,7 @@ export const StarkitchenApp = () => {
     setSuccessFetchingUserEvents(false);
   };
 
-  const { data: nLists, refetch: getNLists } = useReadContract({
+  const { data: nLists, refetch: _getNLists } = useReadContract({
     // Read data from the contract
     functionName: 'get_number_of_tier_lists', // The function name in the contract
     enabled: true, // Should we fetch the data immediately or later(manually)
@@ -43,6 +34,18 @@ export const StarkitchenApp = () => {
     address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
     args: [], // The contract method's arguments as an array
   });
+
+  // TODO(Ohad): mock, remove.
+  const sampleItems = [
+    { id: '1', image: '/placeholder.svg?height=64&width=64&text=1' },
+    { id: '2', image: '/placeholder.svg?height=64&width=64&text=2' },
+    { id: '3', image: '/placeholder.svg?height=64&width=64&text=3' },
+    { id: '4', image: '/placeholder.svg?height=64&width=64&text=4' },
+    { id: '5', image: '/placeholder.svg?height=64&width=64&text=5' },
+    { id: '6', image: '/placeholder.svg?height=64&width=64&text=6' },
+    { id: '7', image: '/placeholder.svg?height=64&width=64&text=7' },
+    { id: '8', image: '/placeholder.svg?height=64&width=64&text=8' },
+  ]
 
   return (
     <div className="min-h-screen w-screen bg-gray-100">
@@ -58,16 +61,9 @@ export const StarkitchenApp = () => {
               <Calendar className="mr-2 h-4 w-4" />
               TierList
             </TabsTrigger>
-            <TabsTrigger value={AppTabs.MEAL_REGISTRATION}>
-              <Calendar className="mr-2 h-4 w-4" />
-              Meal Registration
-            </TabsTrigger>
-            <TabsTrigger
-              disabled={!starknetWallet.isConnected}
-              value={AppTabs.STATS_AND_PREV_MEALS}
-            >
-              <PieChart className="mr-2 h-4 w-4" />
-              History & Stats
+            <TabsTrigger value={AppTabs.TIER_LIST_RANK}>
+              <Cat />
+              Tier List Rank
             </TabsTrigger>
             {isAdmin ? (
               <TabsTrigger value={AppTabs.MANAGEMENT}>
@@ -79,30 +75,8 @@ export const StarkitchenApp = () => {
           <TabsContent value={AppTabs.TIER_LIST} className="space-y-12">
             <TierListTab nLists={nLists} activeTab={activeTab} />
           </TabsContent>
-          <TabsContent value={AppTabs.MEAL_REGISTRATION} className="space-y-12">
-            <UpcomingMealsTab
-              updateMeal={updateMeal}
-              loadingAllEvents={loadingAllEvents}
-              isSuccessFetchingUserEvents={isSuccessFetchingUserEvents}
-              isAllowedUser={isAllowedUser}
-              futureMeals={futureMeals}
-              pastMeals={pastMeals}
-              address={starknetWallet?.address}
-              onConnectWallet={onConnectWallet}
-              isWalletConnected={starknetWallet.isConnected ?? false}
-            />
-          </TabsContent>
-          <TabsContent
-            value={AppTabs.STATS_AND_PREV_MEALS}
-            className="space-y-12"
-          >
-            <StatsTab
-              foodieRank={foodieRank}
-              allTimeMealCount={allTimeMealCount}
-              setActiveTab={setActiveTab}
-              updateMeal={updateMeal}
-              meals={pastMeals}
-            />
+          <TabsContent value={AppTabs.TIER_LIST_RANK} className="space-y-12">
+            <TierListMaker items={sampleItems} />
           </TabsContent>
           {isAdmin ? (
             <TabsContent value={AppTabs.MANAGEMENT} className="space-y-12">

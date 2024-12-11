@@ -148,6 +148,9 @@ export default function ListViewer({ lists, loading, error }: ListViewerProps) {
                             <p className="text-gray-400">ID: {list.id?.toString()}</p>
                         </CardContent>
                         <CardContent>
+                            <img src={"http://192.168.13.34:8000/images/" + list.image_id.toString() + "/"} />
+                        </CardContent>
+                        <CardContent>
                             <p className="text-gray-400">Created At: {list.creation_time?.toString()}</p>
                         </CardContent>
                         <CardContent>
@@ -160,7 +163,7 @@ export default function ListViewer({ lists, loading, error }: ListViewerProps) {
                 ))}
             </div>
             {loading && <p className="text-center">Loading lists...</p>}
-        </div>
+        </div >
     )
 }
 

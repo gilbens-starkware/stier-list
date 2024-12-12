@@ -103,37 +103,42 @@ interface ListViewerProps {
 export default function ListViewer({ lists, loading, error }: ListViewerProps) {
     const [activeListId, setActiveListId] = useState<number | null>(null)
     const [viewLists, setViewLists] = useState<boolean>(false)
+    const [submitTiers, setSubmit] = useState<boolean>(false)
 
     const handleActivateEvent = (id: number) => {
         console.log(`Activating event with ID: ${id}`)
         setActiveListId(id)
+        setSubmit(true)
     }
 
     const handleViewLists = (id: number) => {
         console.log('Viewing lists')
+        setActiveListId(id)
         setViewLists(true)
     }
 
     if (activeListId !== null) {
-        return (
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <Button onClick={() => setActiveListId(null)} className="mb-4">
-                    Back to Lists
-                </Button>
-                <TierListMaker list_id={activeListId} />
-            </main>
-        )
-    }
+        if (submitTiers) {
+            return (
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <Button onClick={() => setSubmit(false)} className="mb-4">
+                        Back to Lists
+                    </Button>
+                    <TierListMaker list_id={activeListId} />
+                </main>
+            )
+        }
+        if (viewLists) {
+            return (
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <Button onClick={() => setViewLists(false)} className="mb-4">
+                        Back to Tier List
+                    </Button>
+                    <TierListViewer list_id={activeListId} />
+                </main>
+            )
+        }
 
-    if (viewLists) {
-        return (
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <Button onClick={() => setViewLists(false)} className="mb-4">
-                    Back to Tier List
-                </Button>
-                <TierListViewer rankData={rankData} images={{}} />
-            </main>
-        )
     }
 
     return (

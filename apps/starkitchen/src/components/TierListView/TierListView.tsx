@@ -1,35 +1,69 @@
 'use client'
 
-import React from 'react'
+import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
+import { useReadContract } from '@starknet-react/core';
+import React, { useEffect, useState } from 'react'
 
 interface TierListViewerProps {
-    rankData: { [key: string]: { [id: string]: number } } // { rank: { id: count } }
-    images: { [id: string]: string } // { id: imageURL }
+    list_id: number
 }
+
+interface ListVotes {
+    // A two-dimensional array of item IDs and their rank distribution.
+    id_ranks: number[][]
+}
+
+const sumRows = (matrix: number[][]): number[] => {
+    return matrix.map(row => row.reduce((acc, val) => acc + val, 0));
+};
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
 
-export default function TierListViewer({ rankData, images }: TierListViewerProps) {
-    // Calculate scores for each item
-    const scores: { [id: string]: number } = {}
+export default function TierListViewer({ list_id }: TierListViewerProps) {
+    const [votes, setVotes] = useState<ListVotes>()
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    console.log('TierListViewer', { list_id })
+    const { data: tierListVote } = useReadContract({
+        // Read data from the contract
+        functionName: 'get_votes', // The function name in the contract
+        abi: ABI, // TODO: Replace with your own ABI
+        address: CONTRACT_ADDRESS, // TODO: Replate with your contract address
+        args: [Number(list_id)], // The contract method's arguments as an array
+    });
+    console.log('TierListViewer', { list_id, tierListVote })
 
-    Object.entries(rankData).forEach(([tier, items]) => {
-        const tierScore = tier === 'S' ? 10 : tier === 'T' ? 5 : tier === 'A' ? 1 : 0
-        Object.entries(items).forEach(([id, count]) => {
-            if (!scores[id]) scores[id] = 0
-            scores[id] += count * tierScore
-        })
-    })
+    useEffect(() => {
+        const fetchVotes = async () => {
+            console.log('totalPossiblePointses...')
+            setLoading(true)
+            setError(null)
+            try {
+                await tierListVote;
+                console.log('Votes:', tierListVote)
+                let newVotes: ListVotes = tierListVote?.map((votes: any) => ({
+                    id_ranks: votes.id_ranks
+                })) ?? [];
+                setVotes(newVotes)
+            } catch (e) {
+                setError('Failed to fetch lists. Please try again later.')
+                console.error('Fetch error:', e)
+            }
+        }
 
-    // Sort items by score
-    const sortedItems = Object.entries(scores).sort((a, b) => b[1] - a[1])
+        fetchVotes()
+    }, [list_id])
+
+    useEffect(() => {
+
+    }, [votes])
+
+    let n_votes = votes ? [0].length || 0 : 0
+    let votes_sum = sumRows(votes?.id_ranks || [])
+    console.log('votes_sum', votes_sum)
 
     // Assign ranks based on sorted scores
-    const rankedData: { [tier: string]: { [id: string]: number } } = { S: {}, T: {}, A: {}, R: {}, K: {} }
-    const totalPossiblePoints = Object.keys(rankData).reduce((sum, tier) => {
-        const tierScore = tier === 'S' ? 10 : tier === 'T' ? 5 : tier === 'A' ? 1 : 0
-        return sum + tierScore
-    }, 0)
+    let totalPossiblePoints = n_votes * 4;
 
     const mean = totalPossiblePoints / 2
     const stdDev = mean / 2
@@ -43,7 +77,10 @@ export default function TierListViewer({ rankData, images }: TierListViewerProps
         return 'K'
     }
 
-    sortedItems.forEach(([id, score]) => {
+    const sortedItems: [number, number][] = votes_sum.map((score, id) => [id, score]).sort((a, b) => b[1] - a[1])
+    const rankedData: { [key: string]: { [key: number]: number } } = { S: {}, T: {}, A: {}, R: {}, K: {} }
+
+    sortedItems.forEach(([id, score]: [number, number]) => {
         const tier = getGaussianRank(score)
         rankedData[tier][id] = score
     })

@@ -9,8 +9,8 @@ interface TierListViewerProps {
 }
 
 interface ListVotes {
-    // A two-dimensional array of item IDs and their rank distribution.
-    id_ranks: number[][]
+    // A two-dimensional array of item IDs and their rank distribution. each entry is the image id and the ranks.
+    id_ranks: { image_id: number, ranks: number[] }[]
 }
 
 const sumRows = (matrix: number[][]): Number[] => {
@@ -21,10 +21,10 @@ const tiers = ['S', 'T', 'A', 'R', 'K']
 
 export default function TierListViewer({ list_id }: TierListViewerProps) {
     const [votes, setVotes] = useState<ListVotes>()
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     console.log('TierListViewer', { list_id })
-    const { data: tierListVote } = useReadContract({
+    const { data: tierListVote, isFetching } = useReadContract({
         // Read data from the contract
         functionName: 'get_votes', // The function name in the contract
         abi: ABI, // TODO: Replace with your own ABI
@@ -40,21 +40,31 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
             setError(null)
             try {
                 await tierListVote;
+
                 console.log('Votes:', tierListVote)
                 let newVotes: ListVotes = tierListVote
                 setVotes(newVotes)
             } catch (e) {
                 setError('Failed to fetch lists. Please try again later.')
                 console.error('Fetch error:', e)
+            } finally {
+                setLoading(false)
             }
         }
 
         fetchVotes()
     }, [list_id])
+
+
     console.log('TierLIST:', tierListVote)
     let n_votes = tierListVote ? tierListVote[0].length || 0 : 0
     console.log('n_votes', n_votes)
-    let votes_sum = sumRows(tierListVote)
+    console.log('loading', loading)
+    if (isFetching) {
+        return <p>Loading...</p>
+    }
+
+    let votes_sum = sumRows(tierListVote.map(vote => vote.ranks))
     console.log('votes_sum', votes_sum)
 
     // Assign ranks based on sorted scores

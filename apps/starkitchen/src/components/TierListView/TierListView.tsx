@@ -22,9 +22,9 @@ const tiers = ['S', 'T', 'A', 'R', 'K']
 const tiers_to_text = { 'S': 'Super', 'T': 'Top-Notch', 'A': 'Acceptable', 'R': 'Run-of-the-mill', 'K': 'Keep Trying...' }
 
 export default function TierListViewer({ list_id }: TierListViewerProps) {
-    const [votes, setVotes] = useState<ListVotes>()
+    const [_votes, setVotes] = useState<ListVotes>()
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    const [_error, setError] = useState<string | null>(null)
     console.log('TierListViewer', { list_id })
     const { data: tierListVote, isFetching } = useReadContract({
         // Read data from the contract
@@ -66,7 +66,7 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
     if (isFetching) {
         return <p>Loading...</p>
     }
-    let n_votes: Number = tierListVote ? tierListVote[0].votes.reduce((acc, val) => acc + Number(val), 0) : 0
+    let n_votes: Number = tierListVote ? tierListVote[0].votes.reduce((acc: number, val: number) => acc + Number(val), 0) : 0
 
     let votes_sum = sumRows(tierListVote.map(vote => vote.votes))
     console.log('n_votes', n_votes)

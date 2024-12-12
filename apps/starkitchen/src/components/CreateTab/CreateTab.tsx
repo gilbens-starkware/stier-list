@@ -1,9 +1,4 @@
 import { useMemo, useState } from 'react';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
 import { getCurrentDate } from '../../utils/date';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -25,9 +20,6 @@ const { month: currentMonth, year: currentYear } = getCurrentDate();
 export const CreateTab = ({ }: {
 
 }) => {
-  const [selectedDate, setSelectedDate] = useState<string>(
-    `${currentYear}-${currentMonth}`,
-  );
 
 
 

@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { Header } from './Header/Header';
-import { useAccount, useProvider, useReadContract } from '@starknet-react/core';
+import { useAccount, } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { ChartBarDecreasing, Users, WandSparkles } from 'lucide-react';
 import { AppTabs } from '../types/ui';
 import { useMealData } from '../hooks/useMealData';
 import { ManagementTab } from './ManagementTab/ManagementTab';
-import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
 import { TierListTab } from './TierListTab/TierListTab';
-import TierListMaker from './TierListRank/TIerListRank';
 import { CreateTab } from './CreateTab/CreateTab';
 
 /// A function to create the main StarkitchenApp component.
@@ -26,17 +24,6 @@ export const StarkitchenApp = () => {
   const onConnectWallet = async () => {
     setSuccessFetchingUserEvents(false);
   };
-
-  const sampleItems = [
-    { id: '1', image: 'http://192.168.13.34:8000/images/1/' },
-    { id: '2', image: '/placeholder.svg?height=64&width=64&text=2' },
-    { id: '3', image: '/placeholder.svg?height=64&width=64&text=3' },
-    { id: '4', image: '/placeholder.svg?height=64&width=64&text=4' },
-    { id: '5', image: '/placeholder.svg?height=64&width=64&text=5' },
-    { id: '6', image: '/placeholder.svg?height=64&width=64&text=6' },
-    { id: '7', image: '/placeholder.svg?height=64&width=64&text=7' },
-    { id: '8', image: '/placeholder.svg?height=64&width=64&text=8' },
-  ]
 
   return (
     <div className="min-h-screen w-screen bg-gray-100">

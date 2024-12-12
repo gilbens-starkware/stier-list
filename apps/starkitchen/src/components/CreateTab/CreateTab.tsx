@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card
 import { Button } from '../ui/button';
 import DynamicBlocks from './AddItem';
 import { Textarea } from '../ui/textarea';
+import { Checkbox } from '../ui/checkbox';
 import { ABI, CONTRACT_ADDRESS, PROVIDER } from '@/utils/consts';
 import { useContract, useSendTransaction } from '@starknet-react/core';
 import { RawArgsObject, TypedContractV2 } from 'starknet';
@@ -125,7 +126,7 @@ export const CreateTab = ({ }: {
   };
 
   const saveTierlist = async () => {
-
+    console.log("Save status CB", isFreeTierlist)
     console.log(blocks);
     let item_images_data = null;
     let has_item_images = false;
@@ -187,17 +188,16 @@ export const CreateTab = ({ }: {
       closeFullscreenLoader?.();
     }
   };
+  const [isFreeTierlist, setIsFreeTierlist] = useState(false);
+  const handleCheckboxChange = (checked: boolean) => {
+    setIsFreeTierlist(checked);
+    console.log("CB status", checked);
+  };
   return (
     <>
 
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Create a new Tierlist</h2>
-
-        <Select value={selectedDate} onValueChange={setSelectedDate}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select month" />
-          </SelectTrigger>
-        </Select>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         <Card>
@@ -212,7 +212,20 @@ export const CreateTab = ({ }: {
               onChange={(e) => updatetTierlistName(e.target.value)}
             />
             <hr className="my-4 border-gray-300" />
-            <SelectTierlistIcon />
+            <div className="flex flex-col space-y-4 mb-4">
+              <div>Tierlist Icon</div>
+              <SelectTierlistIcon />
+            </div>
+            <hr className="my-4 border-gray-300" />
+            <div className="flex flex-col space-y-4 mb-4">
+              Free Tierlist:
+
+              <Checkbox
+                id="free-tierlist"
+                checked={isFreeTierlist}
+                onCheckedChange={handleCheckboxChange}
+              />
+            </div>
             <hr className="my-4 border-gray-300" />
 
             <DynamicBlocks blocks={blocks} setBlocks={setBlocks} />
@@ -228,7 +241,7 @@ export const CreateTab = ({ }: {
         </Card>
 
 
-      </div>
+      </div >
     </>
   );
 };

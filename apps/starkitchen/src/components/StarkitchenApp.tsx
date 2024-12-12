@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Header } from './Header/Header';
 import { useAccount, useProvider, useReadContract } from '@starknet-react/core';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Calendar, Cat, Users, Wrench } from 'lucide-react';
+import { ChartBarDecreasing, Users, WandSparkles } from 'lucide-react';
 import { AppTabs } from '../types/ui';
 import { useMealData } from '../hooks/useMealData';
 import { ManagementTab } from './ManagementTab/ManagementTab';
@@ -49,11 +49,11 @@ export const StarkitchenApp = () => {
         >
           <TabsList>
             <TabsTrigger value={AppTabs.TIER_LIST}>
-              <Calendar className="mr-2 h-4 w-4" />
-              TierList
+              <ChartBarDecreasing className="mr-2 h-4 w-4" />
+              View Tier Lists & Vote
             </TabsTrigger>
             <TabsTrigger value={AppTabs.TIER_LIST_CREATE}>
-              <Wrench />
+              <WandSparkles />
               Create Tier List
             </TabsTrigger>
 

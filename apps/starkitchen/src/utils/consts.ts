@@ -8,14 +8,14 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x022fd1ca9e861773dbc4ff95c610baa4e46edca670b34e1bb27bc7886b47d2df';
+  '0x01b46e340023ae88764d3a6467bba4aefa8edb363df1982900a987bd7bc5bd67';
 export const PROVIDER = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
 });
 
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x022fd1ca9e861773dbc4ff95c610baa4e46edca670b34e1bb27bc7886b47d2df
+/// https://sepolia.starkscan.co/contract/0x01b46e340023ae88764d3a6467bba4aefa8edb363df1982900a987bd7bc5bd67
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {

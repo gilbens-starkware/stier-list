@@ -180,7 +180,7 @@ export function TierListTab({ activeTab }: { activeTab: string }) {
     const [error, setError] = useState<string | null>(null)
 
     console.log('rendering TierListTab...');
-    const { data: tierListMeta } = useReadContract({
+    const { data: tierListMeta, isFetching, isLoading, isSuccess } = useReadContract({
         // Read data from the contract
         functionName: 'get_all_tier_lists', // The function name in the contract
         abi: ABI, // TODO: Replace with your own ABI
@@ -213,7 +213,9 @@ export function TierListTab({ activeTab }: { activeTab: string }) {
 
         fetchLists()
     }, [activeTab])
-
+    if (!isSuccess) {
+        return <div>Loading...</div>
+    }
     console.log('Lists:', lists)
 
     return (

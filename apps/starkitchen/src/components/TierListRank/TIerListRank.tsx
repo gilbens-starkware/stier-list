@@ -18,6 +18,7 @@ interface TierListMakerProps {
 }
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
+const tiers_to_text = { 'S': 'Super', 'T': 'Top-Notch', 'A': 'Acceptable', 'R': 'Run-of-the-mill', 'K': 'Keep Trying...' }
 
 export default function TierListMaker({ list_id }: TierListMakerProps) {
     const [items, setItems] = useState<TierListItem[]>([])
@@ -218,7 +219,7 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
             <h1 className="text-2xl font-bold mb-4">Tier List Rank</h1>
             {[...tiers, 'unranked'].map((tier) => (
                 <div key={tier} className={`mb-2 p-2 rounded-lg ${getTierColor(tier)}`}>
-                    <h2 className="text-xl font-semibold mb-2">{tier.toUpperCase()}</h2>
+                    <h2 className="text-xl font-semibold mb-2">{tiers_to_text[tier]}</h2>
                     <div
                         className="flex flex-wrap gap-2 min-h-[80px] rounded"
                         onDragEnter={(e) => handleDragEnter(e, tier)}

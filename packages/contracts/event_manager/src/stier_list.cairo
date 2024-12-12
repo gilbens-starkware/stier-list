@@ -36,6 +36,12 @@ struct TierListElement {
     image_id: felt252,
 }
 
+#[derive(Copy, Drop, Serde)]
+struct VotesAndId {
+    image_id: felt252,
+    votes: Span<u64>,
+}
+
 #[starknet::interface]
 trait ITierListMaker<T> {
     fn add_tier_list(
@@ -46,7 +52,7 @@ trait ITierListMaker<T> {
     fn get_number_of_tier_lists(self: @T) -> u64;
     fn get_all_tier_lists(self: @T, n_max: usize) -> Span<TierListMeta>;
     fn vote_to_list(ref self: T, list_id: u64, votes: Span<u64>);
-    fn get_votes(self: @T, list_id: u64) -> Span<Span<u64>>;
+    fn get_votes(self: @T, list_id: u64) -> Span<VotesAndId>;
 }
 
 #[starknet::contract]
@@ -60,7 +66,7 @@ mod tier_list_maker {
     use starknet::ContractAddress;
     use starknet::storage::{Map, Vec};
     use crate::utils::time::TimeTrait;
-    use super::{TierList, TierListElement, ShortString, TierListMeta};
+    use super::{TierList, TierListElement, ShortString, TierListMeta, VotesAndId};
     use openzeppelin::token::erc20::{ERC20Component};
 
     // TODO(Gil): Add filterable data structures for tier lists, e.g. by owner, creation time,
@@ -162,7 +168,7 @@ mod tier_list_maker {
                 vote_ptr.write(vote_ptr.read() + 1);
             };
         }
-        fn get_votes(self: @ContractState, list_id: u64) -> Span<Span<u64>> {
+        fn get_votes(self: @ContractState, list_id: u64) -> Span<VotesAndId> {
             let tier_list_ptr = self.tier_lists.entry(list_id);
             let n_elements = tier_list_ptr.elements.len();
             let mut res = array![];
@@ -173,7 +179,8 @@ mod tier_list_maker {
                 for j in 0..super::NUM_TIERS {
                     element_votes.append(element_votes_ptr[j].read());
                 };
-                res.append(element_votes.span());
+                let image_id = tier_list_ptr.elements[i].image_id.read();
+                res.append(VotesAndId { image_id, votes: element_votes.span() });
             };
             res.span()
         }

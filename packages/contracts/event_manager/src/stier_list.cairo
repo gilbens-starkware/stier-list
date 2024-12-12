@@ -39,7 +39,7 @@ struct TierListElement {
 #[starknet::interface]
 trait ITierListMaker<T> {
     fn add_tier_list(
-        ref self: T, name: ShortString, initial_elements: Span<TierListElement>, image_id: felt252
+        ref self: T, name: ShortString, initial_elements: Span<TierListElement>, image_id: felt252,
     ) -> u64;
     fn get_tier_list_meta(self: @T, id: u64) -> TierListMeta;
     fn get_tier_list_elements(self: @T, id: u64) -> Span<TierListElement>;
@@ -51,16 +51,17 @@ trait ITierListMaker<T> {
 
 #[starknet::contract]
 mod tier_list_maker {
+    use starknet::storage::MutableVecTrait;
     use starknet::storage::VecTrait;
     use starknet::storage::StoragePointerReadAccess;
     use starknet::storage::StoragePointerWriteAccess;
     use starknet::storage::StoragePathEntry;
-    use starknet::storage::MutableVecTrait;
     use starknet::storage::StorageMapWriteAccess;
     use starknet::ContractAddress;
     use starknet::storage::{Map, Vec};
     use crate::utils::time::TimeTrait;
     use super::{TierList, TierListElement, ShortString, TierListMeta};
+    use openzeppelin::token::erc20::{ERC20Component};
 
     // TODO(Gil): Add filterable data structures for tier lists, e.g. by owner, creation time,
     // category, etc.
@@ -105,13 +106,15 @@ mod tier_list_maker {
             self.tier_list_order.append().write(tier_list_id);
             let tier_list_ptr = self.tier_lists.entry(tier_list_id);
             tier_list_ptr.meta_data.write(tier_list_meta);
+            let mut c = 0;
             for element in initial_elements {
                 tier_list_ptr.elements.append().write(element.clone());
                 tier_list_ptr.votes.append();
                 #[cairofmt::skip]
                 for _ in 0..super::NUM_TIERS {
-                    tier_list_ptr.votes.append();
+                    tier_list_ptr.votes[c].append();
                 };
+                c += 1;
             };
             tier_list_id
         }
@@ -134,7 +137,6 @@ mod tier_list_maker {
         fn get_all_tier_lists(self: @ContractState, n_max: usize) -> Span<TierListMeta> {
             let mut res = array![];
             let n_tier_lists = self.tier_list_order.len();
-            #[cairofmt::skip]
             for tier_list_id in 0..n_tier_lists {
                 res.append(self.tier_lists.entry(tier_list_id).meta_data.read());
                 if res.len().into() == n_max {
@@ -148,10 +150,11 @@ mod tier_list_maker {
             let n_elements = tier_list_ptr.elements.len();
             assert!(
                 votes.len().into() == n_elements,
-                "Votes length does not match the number of elements"
+                "Votes length does not match the number of elements, {} != {}",
+                votes.len(),
+                n_elements,
             );
             let mut votes_ptr = tier_list_ptr.votes;
-            #[cairofmt::skip]
             for i in 0..n_elements {
                 let element_votes_ptr = votes_ptr[i];
                 let voted_tier = votes[i.try_into().unwrap()];
@@ -164,11 +167,9 @@ mod tier_list_maker {
             let n_elements = tier_list_ptr.elements.len();
             let mut res = array![];
             let votes_ptr = tier_list_ptr.votes;
-            #[cairofmt::skip]
             for i in 0..n_elements {
                 let element_votes_ptr = votes_ptr[i];
                 let mut element_votes = array![];
-                #[cairofmt::skip]
                 for j in 0..super::NUM_TIERS {
                     element_votes.append(element_votes_ptr[j].read());
                 };

@@ -15,4 +15,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: true, // This exposes the server to all network interfaces
+    port: 1234, // You can change this to any port you prefer
+  },
 });

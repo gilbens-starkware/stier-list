@@ -14,10 +14,12 @@ interface ListVotes {
 }
 
 const sumRows = (matrix: number[][]): Number[] => {
-    return matrix.map(row => row.reduce((acc, val) => acc + Number(val), 0));
+    // Sum val*index for each row
+    return matrix.map(row => row.reduce((acc, val, idx) => acc + Number(val) * Number(idx), 0))
 };
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
+const tiers_to_text = { 'S': 'Super', 'T': 'Top-Notch', 'A': 'Acceptable', 'R': 'Run-of-the-mill', 'K': 'Keep Trying...' }
 
 export default function TierListViewer({ list_id }: TierListViewerProps) {
     const [votes, setVotes] = useState<ListVotes>()
@@ -57,14 +59,14 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
 
 
     console.log('TierLIST:', tierListVote)
-    let n_votes = tierListVote ? tierListVote[0].length || 0 : 0
-    console.log('n_votes', n_votes)
     console.log('loading', loading)
     if (isFetching) {
         return <p>Loading...</p>
     }
+    let n_votes: Number = tierListVote ? tierListVote[0].votes.reduce((acc, val) => acc + Number(val), 0) : 0
 
-    let votes_sum = sumRows(tierListVote.map(vote => vote.ranks))
+    let votes_sum = sumRows(tierListVote.map(vote => vote.votes))
+    console.log('n_votes', n_votes)
     console.log('votes_sum', votes_sum)
 
     // Assign ranks based on sorted scores
@@ -73,20 +75,20 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
     const mean = totalPossiblePoints / 2
     const stdDev = mean / 2
 
-    const getGaussianRank = (score: number) => {
+    const getThreshHoldRank = (score: number) => {
         const z = (score - mean) / stdDev
-        if (z >= 1) return 'S'
-        if (z >= 0.5) return 'T'
+        if (z >= 1) return 'K'
+        if (z >= 0.5) return 'R'
         if (z >= 0) return 'A'
-        if (z >= -0.5) return 'R'
-        return 'K'
+        if (z >= -0.5) return 'T'
+        return 'S'
     }
 
     const sortedItems: [number, number][] = votes_sum.map((score, id) => [id, score]).sort((a, b) => b[1] - a[1])
     const rankedData: { [key: string]: { [key: number]: number } } = { S: {}, T: {}, A: {}, R: {}, K: {} }
 
     sortedItems.forEach(([id, score]: [number, number]) => {
-        const tier = getGaussianRank(score)
+        const tier = getThreshHoldRank(score)
         rankedData[tier][id] = score
     })
 
@@ -111,7 +113,7 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
             <h1 className="text-2xl font-bold mb-4">Tier List Viewer</h1>
             {tiers.map((tier) => (
                 <div key={tier} className={`mb-4 p-4 rounded-lg shadow ${getTierColor(tier)}`}>
-                    <h2 className="text-xl font-semibold mb-2">{tier}</h2>
+                    <h2 className="text-xl font-semibold mb-2">{tiers_to_text[tier]}</h2>
                     <div className="flex flex-wrap gap-4">
                         {getRankedItems(tier).map(([id]) => (
                             <div
@@ -121,7 +123,7 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
                             >
                                 <img
                                     src={
-                                        `http://192.168.13.34:8000/images/${id}/` || '/default-image.png'}
+                                        `http://192.168.13.34:8000/images/${tierListVote[id].image_id}/` || '/default-image.png'}
                                     alt={`ID: ${id}`}
                                     className="w-full h-full object-cover"
                                 />

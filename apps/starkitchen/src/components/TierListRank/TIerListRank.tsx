@@ -25,7 +25,6 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
         address: CONTRACT_ADDRESS,
         args: [Number(list_id)],
     });
-
     useEffect(() => {
         const fetchElements = async () => {
             console.log('Fetching elements...')
@@ -40,20 +39,22 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
             } catch (e) {
                 setError('Failed to fetch lists. Please try again later.')
                 console.error('Fetch error:', e)
-            } finally {
-                setTierItems({
-                    S: [],
-                    T: [],
-                    A: [],
-                    R: [],
-                    K: [],
-                    unranked: items,
-                })
             }
         }
 
         fetchElements()
-    }, [list_id, tierListElements])
+    }, [list_id])
+
+    useEffect(() => {
+        setTierItems({
+            S: [],
+            T: [],
+            A: [],
+            R: [],
+            K: [],
+            unranked: items,
+        })
+    }, [items])
 
     const [tierItems, setTierItems] = useState<{ [key: string]: TierListItem[] }>({
         S: [],
@@ -131,6 +132,7 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
             default: return 'bg-gray-100';
         }
     };
+    console.log('TierListMaker', { list_id, tierListElements, tierItems })
 
     return (
         <div className="container mx-auto p-4">

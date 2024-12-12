@@ -1,11 +1,14 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { useProvider, useReadContract } from "@starknet-react/core";
-import { ABI, CONTRACT_ADDRESS } from '@/utils/consts';
+import { useContract, useProvider, useReadContract, useSendTransaction } from "@starknet-react/core";
+import { ABI, CONTRACT_ADDRESS, PROVIDER } from '@/utils/consts';
+import { openFullscreenLoader } from '../FullscreenLoaderModal/FullscreenLoaderModal';
+import { RawArgsObject, TypedContractV2, UINT_128_MAX } from 'starknet';
 
 export interface TierListItem {
+    index: number
     name: string
     image_id: string
 }
@@ -31,7 +34,8 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
             try {
                 await tierListElements;
                 console.log('Elements:', tierListElements)
-                const newItems: TierListItem[] = tierListElements?.map((element: any) => ({
+                const newItems: TierListItem[] = tierListElements?.map((element: any, index: number) => ({
+                    index,
                     name: element.name,
                     image_id: element.image_id
                 })) ?? [];
@@ -109,17 +113,92 @@ export default function TierListMaker({ list_id }: TierListMakerProps) {
         if (dragNode.current) dragNode.current.style.opacity = '1'
         setDraggingItem(null)
     }
+    const [rank_vector, updatetRankVector] = useState<number[]>([]);
 
-    const SubmitTierList = () => {
-        const summary = Object.entries(tierItems).reduce((acc, [tier, items]) => {
-            if (tier !== 'unranked') {
-                acc[tier] = items.length
+    const { contract } = useContract({
+        abi: ABI,
+        address: CONTRACT_ADDRESS,
+        provider: PROVIDER
+    }) as { contract?: TypedContractV2<typeof ABI> };
+    const calls = useMemo(() => {
+        if (!contract) return undefined;
+        console.log("Sending vote to chain");
+        // const calldata: RawArgsObject = {
+        //   name: 'default_tierlist_name',
+        //   initial_elements: [{ name: 'default_item_name', image_id: 'default_image_id' }],
+        // };
+        let content: { list_id: number, votes: number[] } = {
+            list_id: list_id,
+            votes: rank_vector,
+        };
+        console.log("Pre populate", content ?? '');
+        return [contract.populate('vote_to_list', content)];
+    }, [rank_vector]);
+
+    const { sendAsync } = useSendTransaction({
+        calls,
+    });
+
+    const submitVote = async () => {
+        console.log("Voting", rank_vector)
+        let closeFullscreenLoader;
+        try {
+            closeFullscreenLoader = openFullscreenLoader(
+                'Voting for tierlist...',
+            );
+            const { transaction_hash } = await sendAsync();
+            await contract?.providerOrAccount?.waitForTransaction(transaction_hash, {
+                retryInterval: 2e3,
+            });
+
+        } catch (e) {
+            console.error('Error:submit failed', e);
+        } finally {
+            closeFullscreenLoader?.();
+        }
+    };
+
+
+    const SubmitTierList = async () => {
+        // const summary = Object.entries(tierItems).reduce((acc, [tier, items]) => {
+        //     if (tier !== 'unranked') {
+        //         acc[tier] = items.length
+        //     }
+        //     return acc
+        // }, {} as { [key: string]: number })
+
+        // Images IDs run from 0 to n, map image idea to rank: S=1, T=2...
+        // let send_data: { [key: string]: string[] } = { S: [], T: [], A: [], R: [], K: [] };
+        // for (let rank of tiers) {
+        //     for (let idx in tierItems[rank]) {
+        //         let item = tierItems[rank][idx].name;
+        //         send_data[rank].push(item);
+        //     }
+
+        // }
+
+
+
+        let ln = 0;
+        for (let rank of tiers) {
+            ln += tierItems[rank].length;
+        }
+        let new_rank_vector = new Array(ln).fill(0);
+        for (let rank of tiers) {
+
+            for (let idx in tierItems[rank]) {
+                let item = tierItems[rank][idx].index;
+                new_rank_vector[item] = "STARK".indexOf(rank);
             }
-            return acc
-        }, {} as { [key: string]: number })
 
-        console.log('Tier List Summary:', summary)
-        alert(`Tier List Summary: ${JSON.stringify(summary, null, 2)}`)
+        }
+        updatetRankVector(new_rank_vector);
+        console.log('Tier List Summary raw:', tierItems)
+        console.log('Tier List Summary for contract from global var:', rank_vector)
+        console.log('Tier List Summary for contract from local var:', new_rank_vector)
+        await submitVote();
+        // console.log('Tier List Summary:', summary)
+        // alert(`Tier List Summary: ${JSON.stringify(summary, null, 2)}`)
     }
 
     const getTierColor = (tier: string) => {

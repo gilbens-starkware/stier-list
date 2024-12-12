@@ -56,6 +56,9 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
 
         fetchVotes()
     }, [list_id])
+    if (isFetching) {
+        return <div>Loading...</div>
+    }
 
 
     console.log('TierLIST:', tierListVote)

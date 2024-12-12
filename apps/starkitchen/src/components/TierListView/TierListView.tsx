@@ -13,8 +13,8 @@ interface ListVotes {
     id_ranks: number[][]
 }
 
-const sumRows = (matrix: number[][]): number[] => {
-    return matrix.map(row => row.reduce((acc, val) => acc + val, 0));
+const sumRows = (matrix: number[][]): Number[] => {
+    return matrix.map(row => row.reduce((acc, val) => acc + Number(val), 0));
 };
 
 const tiers = ['S', 'T', 'A', 'R', 'K']
@@ -41,9 +41,7 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
             try {
                 await tierListVote;
                 console.log('Votes:', tierListVote)
-                let newVotes: ListVotes = tierListVote?.map((votes: any) => ({
-                    id_ranks: votes.id_ranks
-                })) ?? [];
+                let newVotes: ListVotes = tierListVote
                 setVotes(newVotes)
             } catch (e) {
                 setError('Failed to fetch lists. Please try again later.')
@@ -53,13 +51,10 @@ export default function TierListViewer({ list_id }: TierListViewerProps) {
 
         fetchVotes()
     }, [list_id])
-
-    useEffect(() => {
-
-    }, [votes])
-
-    let n_votes = votes ? [0].length || 0 : 0
-    let votes_sum = sumRows(votes?.id_ranks || [])
+    console.log('TierLIST:', tierListVote)
+    let n_votes = tierListVote ? tierListVote[0].length || 0 : 0
+    console.log('n_votes', n_votes)
+    let votes_sum = sumRows(tierListVote)
     console.log('votes_sum', votes_sum)
 
     // Assign ranks based on sorted scores

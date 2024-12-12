@@ -38,7 +38,7 @@ export const Header = ({
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
             <img
-              src={`/stier-list/starkitchen-logo-transparent.png`}
+              src={`http://192.168.13.34:8000/images/31/`}
               alt="StarKitchen Logo"
               className="h-12"
             />

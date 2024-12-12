@@ -42,7 +42,7 @@ export const Header = ({
               alt="StarKitchen Logo"
               className="h-12"
             />
-            <h1 className="text-3xl font-bold text-gray-900">StierList</h1>
+            <h1 className="text-3xl font-bold text-gray-900">STIER</h1>
           </div>
           <div className="flex items-center space-x-4  mb-4 md:mb-0">
             <h1 className="text-3xl font-bold text-gray-900">{nLists?.toString()}</h1>

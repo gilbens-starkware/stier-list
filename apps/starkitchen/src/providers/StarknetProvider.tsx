@@ -3,12 +3,10 @@ import React from 'react';
 import { sepolia } from '@starknet-react/chains';
 import {
   StarknetConfig,
-  publicProvider,
   argent,
   braavos,
   useInjectedConnectors,
   voyager,
-  blastProvider,
   jsonRpcProvider,
 } from '@starknet-react/core';
 import { Chain } from '@starknet-react/chains';

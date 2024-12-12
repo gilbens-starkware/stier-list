@@ -8,14 +8,14 @@ export const SrcPrefix =
 
 /// The address of the deployed contract.
 export const CONTRACT_ADDRESS =
-  '0x038b229a17f4f618727770d6a9e8cccfca4abaa0f09d79dedf44cdf4db73779b';
+  '0x022fd1ca9e861773dbc4ff95c610baa4e46edca670b34e1bb27bc7886b47d2df';
 export const PROVIDER = new RpcProvider({
   nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
 });
 
 /// The ABI of the deployed contract. Can be found on starkscan.
 /// For the above contract, the ABI can be found at:
-/// https://sepolia.starkscan.co/contract/0x038b229a17f4f618727770d6a9e8cccfca4abaa0f09d79dedf44cdf4db73779b
+/// https://sepolia.starkscan.co/contract/0x022fd1ca9e861773dbc4ff95c610baa4e46edca670b34e1bb27bc7886b47d2df
 /// And the ABI is accessible under the 'Class Code/History' tab -> 'Copy ABI Code' button.
 export const ABI = [
   {
@@ -104,12 +104,26 @@ export const ABI = [
     ]
   },
   {
-    "name": "core::array::Span::<core::array::Span::<core::integer::u64>>",
+    "name": "stier_list::stier_list::VotesAndId",
+    "type": "struct",
+    "members": [
+      {
+        "name": "image_id",
+        "type": "core::felt252"
+      },
+      {
+        "name": "votes",
+        "type": "core::array::Span::<core::integer::u64>"
+      }
+    ]
+  },
+  {
+    "name": "core::array::Span::<stier_list::stier_list::VotesAndId>",
     "type": "struct",
     "members": [
       {
         "name": "snapshot",
-        "type": "@core::array::Array::<core::array::Span::<core::integer::u64>>"
+        "type": "@core::array::Array::<stier_list::stier_list::VotesAndId>"
       }
     ]
   },
@@ -227,7 +241,7 @@ export const ABI = [
         ],
         "outputs": [
           {
-            "type": "core::array::Span::<core::array::Span::<core::integer::u64>>"
+            "type": "core::array::Span::<stier_list::stier_list::VotesAndId>"
           }
         ],
         "state_mutability": "view"
